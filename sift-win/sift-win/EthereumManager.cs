@@ -359,6 +359,8 @@ namespace Lts.Sift.WinClient
                 Logger.ApplicationInstance.Error("Error purchasing SIFT", ex);
                 if (ex.Message.Contains("personal_unlockAccount method not implemented"))
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.MissingRpcPersonal, "Your geth installation doesn't have the personal RPC enabled, please enable it to continue.");
+                else if (ex.Message.Contains("could not decrypt key with given passphrase"))
+                    return new SiftPurchaseResponse(SiftPurchaseFailureType.PasswordInvalid, "The password you supplied was incorrect");
                 return new SiftPurchaseResponse(SiftPurchaseFailureType.Unknown, ex.ToString());
             }
         }

@@ -48,6 +48,11 @@
         /// <summary>
         /// Indicates no receipt was retrieved from the network as mining couldn't be automated.
         /// </summary>
-        NoReceipt
+        NoReceipt,
+
+        /// <summary>
+        /// Indicates that the password supplied was invalid.
+        /// </summary>
+        PasswordInvalid
     }
 }

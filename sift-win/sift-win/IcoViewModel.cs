@@ -322,15 +322,12 @@ namespace Lts.Sift.WinClient
             SiftInvestIsEnabled = SiftAmountToPurchase > 0;
         }
 
-        // Ethereum Manager gets sift account balances
-
         // Show some kind of activity indicator whilst purchase is in progress
-        // Test with invalid password
-        // Ability to send double gas
 
         // Show ownership as % of total fund
         // Show total issuance
 
+        // Ability to send double gas if required
         // Auto-update support built in
         // Installer
 
