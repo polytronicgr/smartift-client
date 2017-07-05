@@ -79,19 +79,29 @@
   <ItemGroup>
     <Compile Include="BaseDragableWindow.cs" />
     <Compile Include="BaseViewModel.cs" />
+    <Compile Include="Commands\AwaitableDelegateCommand.cs" />
+    <Compile Include="Commands\IAsyncCommand.cs" />
     <Compile Include="ContractPhase.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
     <Compile Include="Commands\IRaiseCanExecuteChanged.cs" />
+    <Compile Include="Converters\BoolToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\NullToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="EthereumAmount.cs" />
     <Compile Include="PostIcoViewModel.cs" />
     <Compile Include="PostIcoWindow.xaml.cs">
       <DependentUpon>PostIcoWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SiftApp.cs" />
+    <Compile Include="SiftPurchaseFailureType.cs" />
+    <Compile Include="SiftPurchaseResponse.cs" />
     <Compile Include="SplashScreenViewModel.cs" />
     <Compile Include="SplashScreenWindow.xaml.cs">
       <DependentUpon>SplashScreenWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TransactionUnlockViewModel.cs" />
+    <Compile Include="TransactionUnlockWindow.xaml.cs">
+      <DependentUpon>TransactionUnlockWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="IcoWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -110,6 +120,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SplashScreenWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TransactionUnlockWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

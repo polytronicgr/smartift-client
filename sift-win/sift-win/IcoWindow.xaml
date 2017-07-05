@@ -7,11 +7,13 @@
         mc:Ignorable="d"
         IsEnabled="{Binding Path=IsUiEnabled}" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignData Type=local:IcoViewModel}"
-        Title="Smart Investment Fund Token (SIFT) ICO" SizeToContent="WidthAndHeight" 
-        Background="#4E8EE9" ResizeMode="NoResize" WindowStyle="None">
+        Title="Smart Investment Fund Token (SIFT) ICO" SizeToContent="Height" 
+        Background="#4E8EE9" ResizeMode="NoResize" WindowStyle="None" Width="720">
     <Window.Resources>
         <local:NullToInverseVisibilityConverter x:Key="NullToInverseVisibilityConverter" />
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <local:BoolToInverseVisibilityConverter x:Key="BoolToInverseVisibilityConverter" />
     </Window.Resources>
 
     <Grid Margin="10">
@@ -25,12 +27,12 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,0,0,30">
+        <Border Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,0,0,10">
             <Image Source="Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" MaxWidth="720" />
         </Border>
 
         <!-- Account Selection -->
-        <Grid Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="0,0,0,20">
+        <Grid Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="0,0,0,10" Visibility="{Binding Path=IsAccountSelectionVisible,Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -46,27 +48,40 @@
         </Grid>
 
         <!-- Main Content Grid with Account Selected -->
-        <Grid Grid.Row="2" Grid.Column="0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}">
-            <!-- Balances Grid -->
-            <Grid HorizontalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}">
+            <!-- Balances  -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                <TextBlock FontSize="32" Foreground="White" Text="{Binding Path=SelectedAccount.Balance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="10,0,10,0" />
+                <TextBlock FontSize="32" Foreground="White" Text="{Binding Path=SelectedAccount.BalanceUnit,FallbackValue='ether'}" HorizontalAlignment="Center" Margin="10,0,30,0" />
+                <TextBlock FontSize="32" Foreground="White" Text="{Binding Path=SelectedAccount.SiftBalance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="30,0,10,0" />
+                <TextBlock FontSize="32" Foreground="White" Text="SIFT" HorizontalAlignment="Center" Margin="10,0,10,0" />
+            </StackPanel>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" FontSize="32" Foreground="White" Text="{Binding Path=SelectedAccount.Balance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="10,0,10,0" />
-                <TextBlock Grid.Row="0" Grid.Column="1" FontSize="32" Foreground="White" Text="{Binding Path=SelectedAccount.BalanceUnit,FallbackValue='ether'}" HorizontalAlignment="Center" Margin="10,0,30,0" />
-
-                <TextBlock Grid.Row="0" Grid.Column="2" FontSize="32" Foreground="White" Text="{Binding Path=SelectedAccount.SiftBalance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="30,0,10,0" />
-                <TextBlock Grid.Row="0" Grid.Column="3" FontSize="32" Foreground="White" Text="SIFT" HorizontalAlignment="Center" Margin="10,0,10,0" />
-            </Grid>
-
-        </Grid>
+            <!-- Buy -->
+            <StackPanel Orientation="Vertical" Visibility="{Binding Path=SiftPurchaseIsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                <TextBlock Grid.ColumnSpan="4" Text="You can invest in SIFT using the slider below - just slide it right to show how many SIFT you want to buy then press the buy button." TextWrapping="Wrap" Foreground="White" FontSize="16" />
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" MinWidth="70" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition MinWidth="60" Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding Path=SiftCostToPurchase, StringFormat={}{0:0.00} ether, FallbackValue='0.00 eth'}" FontSize="16" Foreground="White" VerticalAlignment="Center" />
+                    <Slider Grid.Column="1" Minimum="0" Maximum="{Binding Path=SiftMaximumPurchase, FallbackValue=100}" Value="{Binding Path=SiftAmountToPurchase}" Margin="10,0,10,0" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding Path=SiftAmountToPurchase, StringFormat={}{0:0} SIFT, FallbackValue='0 SIFT'}" FontSize="16" Foreground="White" VerticalAlignment="Center" />
+                    <StackPanel Orientation="Vertical" Grid.Column="3" Margin="10,0,0,0">
+                        <Button Content="+" Command="{Binding Path=SiftIncreaseQuantityCommand}" IsEnabled="{Binding Path=SiftIncreaseQuantityIsEnabled}" Width="20" Height="20" />
+                        <Button Content="-" Command="{Binding Path=SiftDecreaseQuantityCommand}" IsEnabled="{Binding Path=SiftDecreaseQuantityIsEnabled}" Width="20" Height="20" />
+                    </StackPanel>
+                    <Button Grid.Column="4" Content="Invest" IsEnabled="{Binding Path=SiftInvestIsEnabled}" Command="{Binding Path=SiftInvestCommand}" Margin="10,0,0,0" Padding="20,10,20,10" />
+                </Grid>
+            </StackPanel>
+            
+            <!-- Not Enough Ether -->
+            <TextBlock Text="You don't have enough ether to buy any SIFT.  Each share in SIFT costs 0.01 ether.  Once you fund your account options to invest in SIFT will appear here." Foreground="White" FontSize="16" TextWrapping="Wrap"  Visibility="{Binding Path=SiftPurchaseIsVisible, Converter={StaticResource BoolToInverseVisibilityConverter}}" />
+        </StackPanel>
 
         <!-- "Please Select An Account" with No Account -->
         <Grid Grid.Row="2" Grid.Column="0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToInverseVisibilityConverter}, FallbackValue='Collapsed'}">
@@ -74,6 +89,6 @@
         </Grid>
 
         <!-- Buttons -->
-        <Button Grid.Row="3" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="10" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" />
+        <Button Grid.Row="3" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="0,10,0,0" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" />
     </Grid>
 </local:BaseDragableWindow>
