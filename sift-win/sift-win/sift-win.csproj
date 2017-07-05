@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Lts.Sift.WinClient.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.BouncyCastle.1.8.1.1\lib\netstandard1.0\crypto.dll</HintPath>
@@ -42,6 +45,9 @@
     </Reference>
     <Reference Include="EdjCase.JsonRpc.Core, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\EdjCase.JsonRpc.Core.1.0.4\lib\net451\EdjCase.JsonRpc.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Guytp.Logging, Version=1.0.231.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Guytp.Logging.1.0.231.0\lib\net45\Guytp.Logging.dll</HintPath>
     </Reference>
     <Reference Include="Nethereum.Portable, Version=1.0.6239.26382, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Nethereum.Portable.1.0.6\lib\portable45-net45+win8+wpa81\Nethereum.Portable.dll</HintPath>
@@ -71,19 +77,18 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    <Compile Include="Commands\DelegateCommand.cs" />
+    <Compile Include="Commands\IRaiseCanExecuteChanged.cs" />
+    <Compile Include="Converters\NullToInverseVisibilityConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="SiftApp.cs" />
     <Page Include="IcoWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="BasePropertyChangedObject.cs" />
+    <Compile Include="EthereumAccount.cs" />
+    <Compile Include="EthereumManager.cs" />
     <Compile Include="IcoViewModel.cs" />
     <Compile Include="IcoWindow.xaml.cs">
       <DependentUpon>IcoWindow.xaml</DependentUpon>
@@ -91,6 +96,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -116,6 +122,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\header.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

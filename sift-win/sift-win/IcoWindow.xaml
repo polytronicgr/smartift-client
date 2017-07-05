@@ -6,34 +6,73 @@
         xmlns:local="clr-namespace:Lts.Sift.WinClient"
         mc:Ignorable="d"
         d:DataContext="{d:DesignData Type=local:IcoViewModel}"
-        Title="Smart Investment Fund Token (SIFT)" SizeToContent="WidthAndHeight" Background="Black">
-    <Grid>
+        Title="Smart Investment Fund Token (SIFT)" SizeToContent="WidthAndHeight" 
+        Background="#4E8EE9" ResizeMode="NoResize" WindowStyle="None" MouseLeftButtonDown="OnMouseLeftButtonDown">
+    <Window.Resources>
+        <local:NullToInverseVisibilityConverter x:Key="NullToInverseVisibilityConverter" />
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+    </Window.Resources>
+    
+    <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
+
+        <Border Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,0,0,30">
+            <Image Source="Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" MaxWidth="720" />
+        </Border>
         
-        <!-- Balances Grid -->
-        <Grid Grid.Row="0" Grid.Column="0">
+        <!-- Account Selection -->
+        <Grid Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="48" Foreground="White" Text="ETH" HorizontalAlignment="Center" Margin="10,0,10,0" />
-            <TextBlock Grid.Row="0" Grid.Column="1" FontSize="48" Foreground="White" Text="SIFT" HorizontalAlignment="Center" Margin="10,0,10,0" />
-
-            <TextBlock Grid.Row="1" Grid.Column="0" FontSize="32" Foreground="White" Text="{Binding Path=EtherBalance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="10,0,10,0" />
-            <TextBlock Grid.Row="1" Grid.Column="1" FontSize="32" Foreground="White" Text="{Binding Path=SiftBalance, FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="10,0,10,0" />
+            <TextBlock Grid.Column="0" Text="Account: " VerticalAlignment="Center" Margin="0,0,10,0" Foreground="White" FontSize="24" />
+            <ComboBox Grid.Column="1" SelectedItem="{Binding Path=SelectedAccount}" ItemsSource="{Binding Path=Accounts}" VerticalAlignment="Center" Margin="10,0,0,0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=Address}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </Grid>
 
-        <Button Grid.Row="1" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="10" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" />
+        <!-- Main Content Grid with Account Selected -->
+        <Grid Grid.Row="2" Grid.Column="0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}">
+            <!-- Balances Grid -->
+            <Grid HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" FontSize="32" Foreground="White" Text="{Binding Path=SelectedAccount.Balance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="10,0,10,0" />
+                <TextBlock Grid.Row="0" Grid.Column="1" FontSize="32" Foreground="White" Text="{Binding Path=SelectedAccount.BalanceUnit,FallbackValue='ether'}" HorizontalAlignment="Center" Margin="10,0,30,0" />
+
+                <TextBlock Grid.Row="0" Grid.Column="2" FontSize="32" Foreground="White" Text="{Binding Path=SelectedAccount.SiftBalance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="30,0,10,0" />
+                <TextBlock Grid.Row="0" Grid.Column="3" FontSize="32" Foreground="White" Text="SIFT" HorizontalAlignment="Center" Margin="10,0,10,0" />
+            </Grid>
+
+        </Grid>
+
+        <!-- "Please Select An Account" with No Account -->
+        <Grid Grid.Row="2" Grid.Column="0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToInverseVisibilityConverter}, FallbackValue='Collapsed'}">
+            <TextBlock FontSize="32" Foreground="White" Text="Please select an account" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+        </Grid>
+
+        <!-- Buttons -->
+        <Button Grid.Row="3" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="10" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" />
     </Grid>
 </Window>

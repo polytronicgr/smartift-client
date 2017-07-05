@@ -1,5 +1,4 @@
-﻿using Nethereum.Web3;
-using System;
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace Lts.Sift.WinClient
@@ -11,76 +10,123 @@ namespace Lts.Sift.WinClient
     {
         #region Declarations
         /// <summary>
-        /// Defines the API interface to Ethereum.
+        /// Defines the ethereum manager we use to get network and account information.
         /// </summary>
-        private readonly Web3 _web3;
+        private readonly EthereumManager _ethereumManager;
 
         /// <summary>
-        /// Defines the current account balance in ether.
+        /// Defines the currently selected ethereum account.
         /// </summary>
-        private decimal _etherBalance;
+        private EthereumAccount _selectedAccount;
 
         /// <summary>
-        /// Defines the current account balance in SIFT.
+        /// Defines whether or not the UI is enabled.
         /// </summary>
-        private decimal _siftBalance;
+        private bool _isUiEnabled;
         #endregion
 
         #region Properties
         /// <summary>
-        /// Gets or sets the current account balance in ether.
-        /// </summary>
-        public decimal EtherBalance
-        {
-            get { return _etherBalance; }
-            set
-            {
-                if (value == _etherBalance)
-                    return;
-                _etherBalance = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the current account balance in SIFT.
-        /// </summary>
-        public decimal SiftBalance
-        {
-            get { return _siftBalance; }
-            set
-            {
-                if (value == _siftBalance)
-                    return;
-                _siftBalance = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        /// <summary>
         /// Gets the command to exit the current application.
         /// </summary>
         public ICommand ExitCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the list of ethereum accounts we know about.
+        /// </summary>
+        public ObservableCollection<EthereumAccount> Accounts {  get { return _ethereumManager.Accounts; } }
+
+        /// <summary>
+        /// Gets or sets the currently selected account.
+        /// </summary>
+        public EthereumAccount SelectedAccount
+        {
+            get { return _selectedAccount; }
+            set
+            {
+                if (_selectedAccount == value)
+                    return;
+                _selectedAccount = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether or not the UI is enabled.
+        /// </summary>
+        public bool IsUiEnabled
+        {
+            get { return _isUiEnabled; }
+            set
+            {
+                if (_isUiEnabled == value)
+                    return;
+                _isUiEnabled = value;
+                NotifyPropertyChanged();
+            }
+        }
         #endregion
 
         /// <summary>
         /// Create a new instance of this class.
         /// </summary>
-        public IcoViewModel()
+        /// <param name="ethereumManager">
+        /// The ethereum manager that this view model uses to obtain information.
+        /// </param>
+        public IcoViewModel(EthereumManager ethereumManager)
         {
-            _web3 = new Web3("http://localhost:8000");
-            string[] accounts = _web3.Eth.Accounts.SendRequestAsync().Result;
-            EtherBalance = decimal.Parse(_web3.Eth.GetBalance.SendRequestAsync(accounts[0]).Result.Value.ToString()) / 1000000000000000000m;
+            IsUiEnabled = true;
+            _ethereumManager = ethereumManager;
+            if (Accounts.Count > 0)
+                SelectedAccount = Accounts[0];
+            else
+                _ethereumManager.Accounts.CollectionChanged += OnAccountsChanged;
+            ExitCommand = new DelegateCommand(Exit);
         }
 
-        // TODO: Threading model
-        // Round based on amount displays (Eth/Wei/etc.)
-        // TODO: Command line connect URL
-        // TODO: Exit command
-        // TODO: Must chose from multiple accounts
+        #region Commands
+        /// <summary>
+        /// Shuts down the application.
+        /// </summary>
+        private void Exit()
+        {
+            IsUiEnabled = false;
+            System.Windows.Application.Current.Shutdown();
+        }
+        #endregion
+
+        #region Event Handlers
+        /// <summary>
+        /// Handle the accounts list loading and select the first account.
+        /// </summary>
+        /// <param name="sender">
+        /// The event sender.
+        /// </param>
+        /// <param name="e">
+        /// The event arguments.
+        /// </param>
+        private void OnAccountsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (Accounts.Count > 0)
+            {
+                SelectedAccount = Accounts[0];
+                _ethereumManager.Accounts.CollectionChanged += OnAccountsChanged;
+            }
+        }
+        #endregion
+
+        // Splash Screen -> Check if ICO, Chose Next Screen -> Requires Ethereum Accounts before Continuing
+        // Placeholder for non ICO mode
+
+        // Logging config stored
+        // Command line connect URL can be passed in
+
+        // Ethereum Manager gets sift account balances
         // TODO: Buy SIFT
         // TODO: Show ownership as % of total fund
         // TODO: Show total issuance
+
+        // TODO: Auto-update support built in
         // TODO: (less important for ICO) - send / approve funds
     }
 }
