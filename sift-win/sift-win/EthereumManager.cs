@@ -259,7 +259,11 @@ namespace Lts.Sift.WinClient
 
                     // If valid contract check total supply
                     if (ContractPhase != ContractPhase.Unknown)
-                        TotalSupply = _contract.GetFunction("totalSupply").CallAsync<ulong>().Result;
+                    {
+                        TotalSupply = _tokenService.GetTotalSupplyAsync<ulong>().Result;
+                        foreach (EthereumAccount account in Accounts)
+                            account.ShareholdingPercentage = TotalSupply == 0 ? 0 : (decimal)account.SiftBalance / TotalSupply * 100;
+                    }
 
                     // Signify a successful loop
                     LastChecksSuccessful = true;

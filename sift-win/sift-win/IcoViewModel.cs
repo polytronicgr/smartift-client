@@ -213,6 +213,14 @@ namespace Lts.Sift.WinClient
         }
 
         /// <summary>
+        /// Gets how many SIFT have been issued in total.
+        /// </summary>
+        public ulong TotalSiftIssued
+        {
+            get { return _ethereumManager.TotalSupply; }
+        }
+
+        /// <summary>
         /// Gets the command to use to send an investment transaction to the blockchain.
         /// </summary>
         public ICommand SiftInvestCommand { get; private set; }
@@ -241,6 +249,7 @@ namespace Lts.Sift.WinClient
             if (Accounts.Count > 0)
                 SelectedAccount = Accounts[0];
             _ethereumManager.Accounts.CollectionChanged += OnAccountsChanged;
+            _ethereumManager.PropertyChanged += OnEthereumManagerPropertyChanged;
             IsAccountSelectionVisible = Accounts.Count != 1;
             SiftInvestCommand = new AwaitableDelegateCommand(Invest);
             SiftIncreaseQuantityCommand = new DelegateCommand(() => { SiftAmountToPurchase++; });
@@ -249,6 +258,21 @@ namespace Lts.Sift.WinClient
         #endregion
 
         #region Event Handlers
+        /// <summary>
+        /// Handle a property changing in the ethereum manager.
+        /// </summary>
+        /// <param name="sender">
+        /// The event sender.
+        /// </param>
+        /// <param name="e">
+        /// The event arguments.
+        /// </param>
+        private void OnEthereumManagerPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "TotalSiftIssued")
+                NotifyPropertyChanged("TotalSiftIssued");
+        }
+
         /// <summary>
         /// Handle the accounts list loading and select the first account.
         /// </summary>
@@ -323,15 +347,12 @@ namespace Lts.Sift.WinClient
         }
 
         // Show some kind of activity indicator whilst purchase is in progress
+        // Ability to send double gas as a maximum if required
+        // Auto resolve not enough gas by purchasing one less
+        // Logging writes to UI somewhere
+        // Command line connect URL can be passed in
 
-        // Show ownership as % of total fund
-        // Show total issuance
-
-        // Ability to send double gas if required
         // Auto-update support built in
         // Installer
-
-        // Logging config stored
-        // Command line connect URL can be passed in
     }
 }

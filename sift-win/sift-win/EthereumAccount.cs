@@ -17,6 +17,11 @@ namespace Lts.Sift.WinClient
         /// Defines the balance in SIFT that this user account.
         /// </summary>
         private ulong _siftBalance;
+
+        /// <summary>
+        /// Defines the shareholding percentage (0-100) for this account.
+        /// </summary>
+        private decimal _shareholdingPercentage;
         #endregion
 
         #region Properties
@@ -40,6 +45,40 @@ namespace Lts.Sift.WinClient
                     return;
                 _siftBalance = value;
                 NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets the percentage shareholding that this user has.
+        /// </summary>
+        public decimal ShareholdingPercentage
+        {
+            get { return _shareholdingPercentage; }
+            set
+            {
+                if (_shareholdingPercentage == value)
+                    return;
+                _shareholdingPercentage = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("DisplayShareholdingPercentage");
+            }
+        }
+
+        /// <summary>
+        /// Gets the display text indicating the shareholding as a percentage of the total fund.
+        /// </summary>
+        public string DisplayShareholdingPercentage
+        {
+            get
+            {
+                if (ShareholdingPercentage <= 0)
+                    return "0%";
+                else if (ShareholdingPercentage <= 0.01m)
+                    return "<0.01%";
+                else if (ShareholdingPercentage < 1)
+                    return Math.Round(ShareholdingPercentage, 2) + "%";
+                else
+                    return Math.Round(ShareholdingPercentage, 1) + "%";
             }
         }
 
