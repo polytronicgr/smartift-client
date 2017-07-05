@@ -1,12 +1,11 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
 
 namespace Lts.Sift.WinClient
 {
     /// <summary>
     /// This class holds the current state of the main window when the contract is in ICO mode of operation.
     /// </summary>
-    public class IcoViewModel : BasePropertyChangedObject
+    public class IcoViewModel : BaseViewModel
     {
         #region Declarations
         /// <summary>
@@ -18,19 +17,9 @@ namespace Lts.Sift.WinClient
         /// Defines the currently selected ethereum account.
         /// </summary>
         private EthereumAccount _selectedAccount;
-
-        /// <summary>
-        /// Defines whether or not the UI is enabled.
-        /// </summary>
-        private bool _isUiEnabled;
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Gets the command to exit the current application.
-        /// </summary>
-        public ICommand ExitCommand { get; private set; }
-
         /// <summary>
         /// Gets the list of ethereum accounts we know about.
         /// </summary>
@@ -50,21 +39,6 @@ namespace Lts.Sift.WinClient
                 NotifyPropertyChanged();
             }
         }
-
-        /// <summary>
-        /// Gets or sets whether or not the UI is enabled.
-        /// </summary>
-        public bool IsUiEnabled
-        {
-            get { return _isUiEnabled; }
-            set
-            {
-                if (_isUiEnabled == value)
-                    return;
-                _isUiEnabled = value;
-                NotifyPropertyChanged();
-            }
-        }
         #endregion
 
         /// <summary>
@@ -81,19 +55,7 @@ namespace Lts.Sift.WinClient
                 SelectedAccount = Accounts[0];
             else
                 _ethereumManager.Accounts.CollectionChanged += OnAccountsChanged;
-            ExitCommand = new DelegateCommand(Exit);
         }
-
-        #region Commands
-        /// <summary>
-        /// Shuts down the application.
-        /// </summary>
-        private void Exit()
-        {
-            IsUiEnabled = false;
-            System.Windows.Application.Current.Shutdown();
-        }
-        #endregion
 
         #region Event Handlers
         /// <summary>
@@ -116,7 +78,6 @@ namespace Lts.Sift.WinClient
         #endregion
 
         // Splash Screen -> Check if ICO, Chose Next Screen -> Requires Ethereum Accounts before Continuing
-        // Placeholder for non ICO mode
 
         // Logging config stored
         // Command line connect URL can be passed in

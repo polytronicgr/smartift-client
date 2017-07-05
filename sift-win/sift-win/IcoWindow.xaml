@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Lts.Sift.WinClient"
         mc:Ignorable="d"
+        IsEnabled="{Binding Path=IsUiEnabled}"
         d:DataContext="{d:DesignData Type=local:IcoViewModel}"
-        Title="Smart Investment Fund Token (SIFT)" SizeToContent="WidthAndHeight" 
+        Title="Smart Investment Fund Token (SIFT) ICO" SizeToContent="WidthAndHeight" 
         Background="#4E8EE9" ResizeMode="NoResize" WindowStyle="None" MouseLeftButtonDown="OnMouseLeftButtonDown">
     <Window.Resources>
         <local:NullToInverseVisibilityConverter x:Key="NullToInverseVisibilityConverter" />
