@@ -1,6 +1,7 @@
 ﻿using Guytp.Logging;
 using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
+using Nethereum.StandardTokenEIP20;
 using Nethereum.Web3;
 using System;
 using System.Collections.ObjectModel;
@@ -69,6 +70,11 @@ namespace Lts.Sift.WinClient
         /// Defines the smart contract to use for communicating with SIFT.
         /// </summary>
         private readonly Contract _contract;
+
+        /// <summary>
+        /// Defines the interface to the ERC20 part of the SIFT contract
+        /// </summary>
+        private readonly StandardTokenService _tokenService;
         #endregion
 
         #region Properties
@@ -180,6 +186,7 @@ namespace Lts.Sift.WinClient
 
             // Store a handle to our contract
             _contract = _web3.Eth.GetContract(abi, ContractAddress);
+            _tokenService = new StandardTokenService(_web3, _contract.Address);
 
             // Start our thread
             _isAlive = true;
@@ -215,12 +222,20 @@ namespace Lts.Sift.WinClient
                             // Get the current balance for this account
                             decimal balance = decimal.Parse(_web3.Eth.GetBalance.SendRequestAsync(address).Result.Value.ToString());
 
+                            // And check the SIFT balance
+                            ulong siftBalance = _tokenService.GetBalanceOfAsync<ulong>(address).Result;
+
                             // See if we have an existing account - if not we'll need to create a new one
                             EthereumAccount existingAccount = Accounts.FirstOrDefault(ac => ac.Address == address);
                             if (existingAccount == null)
-                                Accounts.Add(new EthereumAccount(address, balance));
-                            else if (existingAccount.BalanceWei != balance)
-                                existingAccount.BalanceWei = balance;
+                                Accounts.Add(new EthereumAccount(address, balance, siftBalance));
+                            else
+                            {
+                                if (existingAccount.BalanceWei != balance)
+                                    existingAccount.BalanceWei = balance;
+                                if (existingAccount.SiftBalance != siftBalance)
+                                    existingAccount.SiftBalance = siftBalance;
+                            }
                         }
                     }
 

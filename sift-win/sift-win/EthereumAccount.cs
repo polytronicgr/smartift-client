@@ -16,7 +16,7 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines the balance in SIFT that this user account.
         /// </summary>
-        private uint _siftBalance;
+        private ulong _siftBalance;
         #endregion
 
         #region Properties
@@ -28,7 +28,7 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Gets or sets the current sift balance for this account.
         /// </summary>
-        public uint SiftBalance
+        public ulong SiftBalance
         {
             get
             {
@@ -88,10 +88,14 @@ namespace Lts.Sift.WinClient
         /// <param name="balanceWei">
         /// The balance in wei for the account.
         /// </param>
-        public EthereumAccount(string address, decimal balanceWei)
+        /// <param name="siftBalance">
+        /// The SIFT balance that this account has.
+        /// </param>
+        public EthereumAccount(string address, decimal balanceWei, ulong siftBalance)
         {
             Address = address;
             BalanceWei = balanceWei;
+            SiftBalance = siftBalance;
         }
         #endregion
     }

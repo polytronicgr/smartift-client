@@ -323,9 +323,11 @@ namespace Lts.Sift.WinClient
         }
 
         // Ethereum Manager gets sift account balances
+
         // Show some kind of activity indicator whilst purchase is in progress
+        // Test with invalid password
         // Ability to send double gas
-        // Buy SIFT (slider and textbox)
+
         // Show ownership as % of total fund
         // Show total issuance
 
@@ -334,7 +336,5 @@ namespace Lts.Sift.WinClient
 
         // Logging config stored
         // Command line connect URL can be passed in
-
-        // Password entry to unlock wallet
     }
 }
