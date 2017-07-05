@@ -34,11 +34,10 @@ namespace Lts.Sift.WinClient
         /// </param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            IcoWindow window = new IcoWindow()
+            new SplashScreenWindow()
             {
-                DataContext = new IcoViewModel(_ethereumManager)
-            };
-            window.Show();
+                DataContext = new SplashScreenViewModel(_ethereumManager)
+            }.Show();
         }
 
         /// <summary>

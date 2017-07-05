@@ -1,0 +1,33 @@
+﻿<local:BaseDragableWindow x:Class="Lts.Sift.WinClient.SplashScreenWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lts.Sift.WinClient"
+        mc:Ignorable="d"
+        IsEnabled="{Binding Path=IsUiEnabled}"
+        d:DataContext="{d:DesignData Type=local:SplashScreenViewModel}"
+        Title="Smart Investment Fund Token (SIFT)" WindowStartupLocation="CenterScreen"
+        Background="#4E8EE9" ResizeMode="NoResize" WindowStyle="None" Width="420" Height="200">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Row="0"  HorizontalAlignment="Stretch" Margin="0,0,0,10">
+            <Image Source="Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" Width="400" />
+        </Border>
+
+        <TextBlock Grid.Row="1" FontSize="16" Foreground="White" Text="{Binding Path=StatusText,FallbackValue='Status text goes here on the splashscreen...'}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+
+        <Button Grid.Row="2" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="10" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" Visibility="{Binding Path=IsExitButtonVisible, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}" VerticalAlignment="Bottom" />
+    </Grid>
+</local:BaseDragableWindow>

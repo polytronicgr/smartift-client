@@ -1,9 +1,13 @@
 ﻿using Guytp.Logging;
+using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Web3;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Lts.Sift.WinClient
 {
@@ -13,6 +17,11 @@ namespace Lts.Sift.WinClient
     public class EthereumManager : BasePropertyChangedObject, IDisposable
     {
         #region Declarations
+        /// <summary>
+        /// Defines the address of SIFT's contract.
+        /// </summary>
+        private const string ContractAddress = "0xAeE66f6DDbFD69D40A0C0e524f18fb273FF6Aac9";
+
         /// <summary>
         /// Defines whether or not the thread is alive that checks in the background.
         /// </summary>
@@ -27,6 +36,31 @@ namespace Lts.Sift.WinClient
         /// Defines the API client to access the ethereum network.
         /// </summary>
         private readonly Web3 _web3;
+
+        /// <summary>
+        /// Defines the phase the SIFT contract is currently in.
+        /// </summary>
+        private ContractPhase _contractPhase;
+
+        /// <summary>
+        /// Defines the current block number.
+        /// </summary>
+        private ulong _blockNumber;
+
+        /// <summary>
+        /// Defines whether or not ethereum is currently syncing.
+        /// </summary>
+        private bool _isSyncing;
+
+        /// <summary>
+        /// Defines whether the last checks to the network were successful.
+        /// </summary>
+        private bool _lastChecksSuccessful;
+
+        /// <summary>
+        /// Defines the smart contract to use for communicating with SIFT.
+        /// </summary>
+        private readonly Contract _contract;
         #endregion
 
         #region Properties
@@ -34,6 +68,66 @@ namespace Lts.Sift.WinClient
         /// Gets the list of accounts known about by the manager.
         /// </summary>
         public ObservableCollection<EthereumAccount> Accounts { get; private set; }
+
+        /// <summary>
+        /// Gets the current phase that the SIFT contract is in.
+        /// </summary>
+        public ContractPhase ContractPhase
+        {
+            get { return _contractPhase; }
+            private set
+            {
+                if (_contractPhase == value)
+                    return;
+                _contractPhase = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets the current block number.
+        /// </summary>
+        public ulong BlockNumber
+        {
+            get { return _blockNumber; }
+            private set
+            {
+                if (_blockNumber == value)
+                    return;
+                _blockNumber = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets whether or not the current block is syncing.
+        /// </summary>
+        public bool IsSyncing
+        {
+            get { return _isSyncing; }
+            private set
+            {
+                if (_isSyncing == value)
+                    return;
+                _isSyncing = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets whether or not the last checks to the ethereum network were successful.
+        /// </summary>
+        public bool LastChecksSuccessful
+        {
+            get { return _lastChecksSuccessful; }
+            private set
+            {
+                if (_lastChecksSuccessful == value)
+                    return;
+                _lastChecksSuccessful = value;
+                NotifyPropertyChanged();
+            }
+        }
         #endregion
 
         #region Constructors
@@ -45,6 +139,19 @@ namespace Lts.Sift.WinClient
             // Create basic objects we'll need
             _web3 = new Web3(url);
             Accounts = new ObservableCollection<EthereumAccount>();
+            
+            // Read in our contract ABI
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string resourceName = "Lts.Sift.WinClient.Sift.abi";
+            string abi;
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                using (StreamReader reader = new StreamReader(stream))
+                    abi = reader.ReadToEnd();
+            if (string.IsNullOrEmpty(abi))
+                throw new Exception("Error reading contract ABI");
+
+            // Store a handle to our contract
+            _contract = _web3.Eth.GetContract(abi, ContractAddress);
 
             // Start our thread
             _isAlive = true;
@@ -59,6 +166,7 @@ namespace Lts.Sift.WinClient
         /// </summary>
         private void ThreadEntry()
         {
+            DateTime nextContractCheckTime = DateTime.UtcNow;
             while (_isAlive)
             {
                 try
@@ -88,6 +196,27 @@ namespace Lts.Sift.WinClient
                         }
                     }
 
+                    // Let's get the block number and check if we're syncing to just set some basics bits and bobs up
+                    BlockNumber = ulong.Parse(_web3.Eth.Blocks.GetBlockNumber.SendRequestAsync().Result.Value.ToString());
+                    IsSyncing = _web3.Eth.Syncing.SendRequestAsync().Result.IsSyncing;
+
+                    // Ask the contract our status but first check we've got the right contract
+                    if (DateTime.UtcNow >= nextContractCheckTime)
+                    {
+                        string contractVersion = _contract.GetFunction("siftContractVersion").CallAsync<string>().Result;
+                        if (contractVersion == "SIFT 201707051557")
+                        {
+                            bool isIcoPhase = _contract.GetFunction("icoPhase").CallAsync<bool>().Result;
+                            ContractPhase = isIcoPhase ? ContractPhase.Ico : ContractPhase.Trading;
+                        }
+                        else
+                            ContractPhase = ContractPhase.Unknown;
+                        nextContractCheckTime = DateTime.UtcNow.AddSeconds(10);
+                    }
+
+                    // Signify a successful loop
+                    LastChecksSuccessful = true;
+
                     // Wait to try again
                     DateTime nextTime = DateTime.UtcNow.AddSeconds(3);
                     while (DateTime.UtcNow < nextTime && _isAlive)
@@ -95,9 +224,29 @@ namespace Lts.Sift.WinClient
                 }
                 catch (Exception ex)
                 {
+                    LastChecksSuccessful = false;
                     Logger.ApplicationInstance.Error("There was an unexpected error updating Ethereum network information", ex);
                 }
             }
+        }
+        #endregion
+
+        #region Helper Methods
+        /// <summary>
+        /// Enable mining for a specific transaction.
+        /// </summary>
+        /// <param name="transactionHash"></param>
+        /// <returns></returns>
+        public async Task<TransactionReceipt> MineAndGetReceiptAsync(string transactionHash)
+        {
+            if (!await _web3.Miner.Start.SendRequestAsync(1))
+                throw new Exception("Mining start failed");
+            TransactionReceipt receipt;
+            while ((receipt = await _web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(transactionHash)) == null)
+                Thread.Sleep(1000);
+            if (!await _web3.Miner.Stop.SendRequestAsync())
+                throw new Exception("Mining stop failed");
+            return receipt;
         }
         #endregion
 

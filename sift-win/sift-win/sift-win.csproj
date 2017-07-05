@@ -77,11 +77,22 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseDragableWindow.cs" />
+    <Compile Include="BaseViewModel.cs" />
+    <Compile Include="ContractPhase.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
     <Compile Include="Commands\IRaiseCanExecuteChanged.cs" />
     <Compile Include="Converters\NullToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="PostIcoViewModel.cs" />
+    <Compile Include="PostIcoWindow.xaml.cs">
+      <DependentUpon>PostIcoWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SiftApp.cs" />
+    <Compile Include="SplashScreenViewModel.cs" />
+    <Compile Include="SplashScreenWindow.xaml.cs">
+      <DependentUpon>SplashScreenWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="IcoWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -94,6 +105,14 @@
       <DependentUpon>IcoWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PostIcoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SplashScreenWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -119,6 +138,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Include="Sift.abi" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

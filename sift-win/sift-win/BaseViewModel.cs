@@ -12,6 +12,11 @@ namespace Lts.Sift.WinClient
         /// Defines whether or not the UI is enabled.
         /// </summary>
         private bool _isUiEnabled;
+
+        /// <summary>
+        /// Defines the ethereum manager we use to get network and account information.
+        /// </summary>
+        protected readonly EthereumManager _ethereumManager;
         #endregion
 
         #region Properties
@@ -40,10 +45,14 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Create a new instance of this class.
         /// </summary>
-        protected BaseViewModel()
+        /// <param name="ethereumManager">
+        /// The ethereum manager that this view model uses to obtain information.
+        /// </param>
+        protected BaseViewModel(EthereumManager ethereumManager)
         {
             ExitCommand = new DelegateCommand(Exit);
-
+            IsUiEnabled = true;
+            _ethereumManager = ethereumManager;
         }
         #endregion
 
@@ -57,6 +66,5 @@ namespace Lts.Sift.WinClient
             System.Windows.Application.Current.Shutdown();
         }
         #endregion
-
     }
 }

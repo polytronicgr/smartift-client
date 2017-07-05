@@ -9,11 +9,6 @@ namespace Lts.Sift.WinClient
     {
         #region Declarations
         /// <summary>
-        /// Defines the ethereum manager we use to get network and account information.
-        /// </summary>
-        private readonly EthereumManager _ethereumManager;
-
-        /// <summary>
         /// Defines the currently selected ethereum account.
         /// </summary>
         private EthereumAccount _selectedAccount;
@@ -41,6 +36,7 @@ namespace Lts.Sift.WinClient
         }
         #endregion
 
+        #region Constructors
         /// <summary>
         /// Create a new instance of this class.
         /// </summary>
@@ -48,14 +44,14 @@ namespace Lts.Sift.WinClient
         /// The ethereum manager that this view model uses to obtain information.
         /// </param>
         public IcoViewModel(EthereumManager ethereumManager)
+            : base(ethereumManager)
         {
-            IsUiEnabled = true;
-            _ethereumManager = ethereumManager;
             if (Accounts.Count > 0)
                 SelectedAccount = Accounts[0];
             else
                 _ethereumManager.Accounts.CollectionChanged += OnAccountsChanged;
         }
+        #endregion
 
         #region Event Handlers
         /// <summary>
@@ -83,11 +79,12 @@ namespace Lts.Sift.WinClient
         // Command line connect URL can be passed in
 
         // Ethereum Manager gets sift account balances
-        // TODO: Buy SIFT
-        // TODO: Show ownership as % of total fund
-        // TODO: Show total issuance
+        // Buy SIFT
+        // Show ownership as % of total fund
+        // Show total issuance
 
-        // TODO: Auto-update support built in
-        // TODO: (less important for ICO) - send / approve funds
+        // Auto-update support built in
+        // Installer
+        // (less important for ICO) - send / approve funds
     }
 }

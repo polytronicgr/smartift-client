@@ -1,17 +1,15 @@
-﻿using System.Windows;
-
-namespace Lts.Sift.WinClient
+﻿namespace Lts.Sift.WinClient
 {
     /// <summary>
-    /// The ICO window displays the state of SIFT during the ICO phase and offers basic functionality to display ownership statistics and allow buying of SIFT.
+    /// Code to support the splash screen window.
     /// </summary>
-    public partial class IcoWindow : BaseDragableWindow
+    public partial class SplashScreenWindow : BaseDragableWindow
     {
         #region Constructors
         /// <summary>
         /// Create a new instance of this class.
         /// </summary>
-        public IcoWindow()
+        public SplashScreenWindow()
         {
             // Hookup to XAML and initialise components
             InitializeComponent();
