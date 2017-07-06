@@ -4,6 +4,7 @@ using Nethereum.RPC.Eth.DTOs;
 using Nethereum.StandardTokenEIP20;
 using Nethereum.Web3;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -39,7 +40,12 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines the thread that frequently checks the status from Ethereum in the background.
         /// </summary>
-        private Thread _thread;
+        private Thread _networkCheckThread;
+
+        /// <summary>
+        /// Defines the thread that mines queued transactions.
+        /// </summary>
+        private Thread _transactionConfirmationThread;
 
         /// <summary>
         /// Defines the API client to access the ethereum network.
@@ -85,6 +91,16 @@ namespace Lts.Sift.WinClient
         /// Defines an object containing default gas info for sending some gas from an account to the contract with some wei to use as a rule-of-thumb.
         /// </summary>
         private TransactionGasInfo _defaultGasInfo;
+
+        /// <summary>
+        /// Defines a locker object that allows access to our mining queue.
+        /// </summary>
+        private readonly object _miningQueueLocker = new object();
+
+        /// <summary>
+        /// Defines a list of transactions we need to wait to be mined.
+        /// </summary>
+        private readonly List<EnqueuedTransaction> _miningQueue = new List<EnqueuedTransaction>();
         #endregion
 
         #region Properties
@@ -219,8 +235,10 @@ namespace Lts.Sift.WinClient
 
             // Start our thread
             _isAlive = true;
-            _thread = new Thread(ThreadEntry) { IsBackground = true, Name = "Ethereum Manager" };
-            _thread.Start();
+            _networkCheckThread = new Thread(NetworkCheckThreadEntry) { IsBackground = true, Name = "Ethereum Manager" };
+            _networkCheckThread.Start();
+            _transactionConfirmationThread = new Thread(TransactionConfirmationThreadEntry) { IsBackground = true, Name = "Transaction Confirmation" };
+            _transactionConfirmationThread.Start();
         }
         #endregion
 
@@ -228,7 +246,7 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// This method provides the main entry point for the background thread that keeps ethereum wallet information synchronised.
         /// </summary>
-        private void ThreadEntry()
+        private void NetworkCheckThreadEntry()
         {
             Logger.ApplicationInstance.Info("Network status thread started");
             bool connectedYet = false;
@@ -334,6 +352,125 @@ namespace Lts.Sift.WinClient
                     Thread.Sleep(100);
             }
         }
+
+        /// <summary>
+        /// This thread is responsible for confirming transactions that are in a queue.
+        /// </summary>
+        private void TransactionConfirmationThreadEntry()
+        {
+            bool minerStarted = false;
+            while (_isAlive)
+            {
+                // No point doing this if we aren't successfully connected to the wallet
+                if (!LastChecksSuccessful)
+                {
+                    Thread.Sleep(100);
+                    continue;
+                }
+
+                double waitTime = 3;
+                try
+                {
+                    // Get a copy of the queue
+                    EnqueuedTransaction[] queuedTransactions;
+                    lock (_miningQueueLocker)
+                    {
+                        queuedTransactions = _miningQueue.ToArray();
+                        _miningQueue.Clear();
+                    }
+
+                    // If we have queued transactions let's try to give them all a process now
+                    decimal hashRate;
+                    if (queuedTransactions.Length > 0)
+                    {
+                        // If we are not mining, try to start mining
+                        hashRate = decimal.Parse(new Nethereum.RPC.Eth.Mining.EthHashrate(_web3.Client).SendRequestAsync().Result.Value.ToString());
+                        if (hashRate < 0)
+                        {
+                            Logger.ApplicationInstance.Debug("Starting miner to mine these transactions");
+                            try
+                            {
+                                int cores = Environment.ProcessorCount / 2;
+                                if (!_web3.Miner.Start.SendRequestAsync(cores).Result)
+                                    Logger.ApplicationInstance.Error("Mining start failed");
+                                else
+                                {
+                                    Logger.ApplicationInstance.Info("Started to mine for tranasctions using " + cores + " threads");
+                                    minerStarted = true;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.ApplicationInstance.Error("Failed to start mining", ex);
+                            }
+                        }
+
+                        // Now let's mine everything
+                        foreach (EnqueuedTransaction transaction in queuedTransactions)
+                        {
+                            try
+                            {
+                                TransactionReceipt receipt = _web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(transaction.TransactionHash).Result;
+                                if (receipt != null)
+                                    transaction.MarkSuccess(receipt);
+                                else if (transaction.Age.TotalMinutes > 10)
+                                    transaction.MarkFailed("Transaction did not mine within ten minutes, please check your full Ethereum wallet for more information");
+                            }
+                            catch (Exception ex)
+                            {
+                                // This could be RPC error or anything else, so don't actually fail it here
+                                Logger.ApplicationInstance.Error("Failed to mine transaction " + transaction.TransactionHash, ex);
+                            }
+                        }
+                    }
+                    
+                    // Remove any complete transactions from our list
+                    EnqueuedTransaction[] remainingTransactions = queuedTransactions.Where(t => !t.Completed).ToArray();
+                    bool anyTransactionsInQueue;
+                    lock (_miningQueueLocker)
+                    {
+                        if (remainingTransactions.Length > 0)
+                            _miningQueue.AddRange(remainingTransactions);
+                        anyTransactionsInQueue = _miningQueue.Count > 0;
+                    }
+
+                    // If no transactions left and miner is running and we started it, we can terminate the miner now
+                    if (!anyTransactionsInQueue && minerStarted)
+                    {
+                        minerStarted = false;
+                        hashRate = decimal.Parse(new Nethereum.RPC.Eth.Mining.EthHashrate(_web3.Client).SendRequestAsync().Result.Value.ToString());
+                        Logger.ApplicationInstance.Debug("No transactions to mine and we started miner, so attempting to stop it now");
+                        if (hashRate > 0)
+                        {
+                            try
+                            {
+                                if (!_web3.Miner.Stop.SendRequestAsync().Result)
+                                    Logger.ApplicationInstance.Error("Stopping mining failed");
+                                else
+                                    Logger.ApplicationInstance.Info("Miner stopped successfully");
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.ApplicationInstance.Error("Failed to stop mining", ex);
+                            }
+                        }
+                    }
+
+                    // Update the queue - set wait time accordingly
+                    waitTime = anyTransactionsInQueue ? 0.1 : 1;
+                }
+                catch (Exception ex)
+                {
+                    Logger.ApplicationInstance.Error("Unexpected error attempting to mine queue", ex);
+                    waitTime = 3;
+                }
+
+                // Wait to try again
+                DateTime nextTime = DateTime.UtcNow.AddSeconds(waitTime);
+                while (DateTime.UtcNow < nextTime && _isAlive)
+                    Thread.Sleep(100);
+            }
+        }
         #endregion
 
         /// <summary>
@@ -432,14 +569,11 @@ namespace Lts.Sift.WinClient
                     GasPrice = new HexBigInteger(new BigInteger(viewModel.SelectedGasMultiplier * gasCost)),
                     Gas = new HexBigInteger(new BigInteger(viewModel.Gas))
                 };
-                string transactionHash = await _web3.Eth.Transactions.SendTransaction.SendRequestAsync(transactionInput);
                 Logger.ApplicationInstance.Info("Send transaction for " + purchaseCostWei + " to " + ContractAddress + " from " + address);
-                TransactionReceipt receipt = await MineAndGetReceiptAsync(transactionHash);
-                if (receipt == null)
-                    return new SiftPurchaseResponse(SiftPurchaseFailureType.NoReceipt, "The transaction was performed but we could not mine the receipt, please manually start your miner in your wallet to ensure the transaction is sent to the network");
+                string transactionHash = await _web3.Eth.Transactions.SendTransaction.SendRequestAsync(transactionInput);
 
-                // Return the success response
-                return new SiftPurchaseResponse();
+                // Return the response of the transaction hash
+                return new SiftPurchaseResponse(transactionHash);
             }
             catch (Exception ex)
             {
@@ -452,47 +586,22 @@ namespace Lts.Sift.WinClient
             }
         }
 
-        #region Helper Methods
         /// <summary>
-        /// Enable mining for a specific transaction.
+        /// Enqueue a transaction that has been sent into the mining queue to get a receipt for it.
         /// </summary>
-        /// <param name="transactionHash"></param>
+        /// <param name="transactionHash">
+        /// The hash of the transaction.
+        /// </param>
         /// <returns>
-        /// A receipt from the execution of a transaction.
+        /// An object to track the state of the mining.
         /// </returns>
-        public async Task<TransactionReceipt> MineAndGetReceiptAsync(string transactionHash)
+        public EnqueuedTransaction EnqueueTransactionPendingReceipt(string transactionHash)
         {
-            bool startedMiner = false;
-            try
-            {
-                Logger.ApplicationInstance.Debug("Attempting to start miner");
-                if (!await _web3.Miner.Start.SendRequestAsync(1))
-                    Logger.ApplicationInstance.Error("Mining start failed");
-                startedMiner = true;
-            }
-            catch (Exception ex)
-            {
-                Logger.ApplicationInstance.Error("Failed to start mining", ex);
-                return null;
-            }
-            TransactionReceipt receipt;
-            Logger.ApplicationInstance.Info("Getting receipt for transaction " + transactionHash);
-            while ((receipt = await _web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(transactionHash)) == null)
-                Thread.Sleep(1000);
-            if (startedMiner)
-                try
-                {
-                    Logger.ApplicationInstance.Debug("Attempting to stop miner");
-                    if (!await _web3.Miner.Stop.SendRequestAsync())
-                        Logger.ApplicationInstance.Error("Stopping mining failed");
-                }
-                catch (Exception ex)
-                {
-                    Logger.ApplicationInstance.Error("Failed to stop mining", ex);
-                }
-            return receipt;
+            EnqueuedTransaction transaction = new EnqueuedTransaction(transactionHash);
+            lock (_miningQueueLocker)
+                _miningQueue.Add(transaction);
+            return transaction;
         }
-        #endregion
 
         #region IDisposable Implementation
         /// <summary>
@@ -501,10 +610,15 @@ namespace Lts.Sift.WinClient
         public void Dispose()
         {
             _isAlive = false;
-            if (_thread != null)
+            if (_networkCheckThread != null)
             {
-                _thread.Join();
-                _thread = null;
+                _networkCheckThread?.Join();
+                _networkCheckThread = null;
+            }
+            if (_transactionConfirmationThread != null)
+            {
+                _transactionConfirmationThread?.Join();
+                _transactionConfirmationThread = null;
             }
         }
         #endregion

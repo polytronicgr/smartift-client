@@ -20,14 +20,23 @@
         /// Gets additional details describing why the purchase failed.
         /// </summary>
         public string FailureReason { get; private set; }
+
+        /// <summary>
+        /// Gets the hash of the successful transaction.
+        /// </summary>
+        public string TransactionHash { get; private set; }
         #endregion
 
         #region Constructors
         /// <summary>
         /// Creates a new instance of this class.
         /// </summary>
-        public SiftPurchaseResponse()
+        /// <param name="transactionHash">
+        /// The hash of the successful transaction.
+        /// </param>
+        public SiftPurchaseResponse(string transactionHash)
         {
+            TransactionHash = transactionHash;
             WasSuccessful = true;
         }
 

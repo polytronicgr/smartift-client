@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Guytp.Logging;
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -56,6 +57,11 @@ namespace Lts.Sift.WinClient
         /// Defines whether the invest decrease quantity button is enabled.
         /// </summary>
         private bool _siftDecreaseQuantityIsEnabled;
+
+        /// <summary>
+        /// Defines the transaction currently being mined after a purchase, if one is set.
+        /// </summary>
+        private EnqueuedTransaction _transactionToMine;
         #endregion
 
         #region Properties
@@ -221,6 +227,21 @@ namespace Lts.Sift.WinClient
         }
 
         /// <summary>
+        /// Gets the transaction currently being mined after a purchase, if one is set.
+        /// </summary>
+        public EnqueuedTransaction TransactionToMine
+        {
+            get { return _transactionToMine; }
+            private set
+            {
+                if (_transactionToMine == value)
+                    return;
+                _transactionToMine = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Gets the command to use to send an investment transaction to the blockchain.
         /// </summary>
         public ICommand SiftInvestCommand { get; private set; }
@@ -258,6 +279,41 @@ namespace Lts.Sift.WinClient
         #endregion
 
         #region Event Handlers
+        /// <summary>
+        /// Handle the transaction we're mining having it's properties updated.
+        /// </summary>
+        /// <param name="sender">
+        /// The event sender.
+        /// </param>
+        /// <param name="e">
+        /// The event arguments.
+        /// </param>
+        private void OnTransactionToMinePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            // Only process changes indicating completion
+            EnqueuedTransaction transaction = sender as EnqueuedTransaction;
+            if (transaction == null || TransactionToMine == null)
+                return;
+            if (!transaction.Completed)
+                return;
+
+            // Clear out the transaction to mine
+            TransactionToMine = null;
+
+            // Display a message accordingly
+            if (transaction.WasSuccessful)
+            {
+                Logger.ApplicationInstance.Info("Purchase of SIFT added to block " + transaction.Receipt.BlockNumber.Value.ToString() + " for " + transaction.Receipt.TransactionHash + " at index " + transaction.Receipt.TransactionIndex.Value.ToString());
+                MessageBox.Show("Congratulations, your transaction for the purchase of SIFT has gone onto the Ethereum network.  Your new balance will be updated shortly and will be reflected in your Ethereum wallet.", "SIFT Investment", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                Logger.ApplicationInstance.Error("TransactionToMine failed with message.  " + transaction.ErrorDetails);
+                MessageBox.Show("There was a problem processing your transaction for SIFT.  " + transaction.ErrorDetails, "SIFT Purchase", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
         /// <summary>
         /// Handle a property changing in the ethereum manager.
         /// </summary>
@@ -317,10 +373,21 @@ namespace Lts.Sift.WinClient
 
             // Perform the purchase
             SiftPurchaseResponse response = await _ethereumManager.PurchaseSift(SelectedAccount.Address, SiftAmountToPurchase);
-            if (response.WasSuccessful)
-                MessageBox.Show("Congratulations!  Your SIFT transaction was successfully processed and your balance will be reflected shortly.");
-            else if (response.FailureType != SiftPurchaseFailureType.UserCancelled)
+            if (!response.WasSuccessful)
                 MessageBox.Show("Sorry, there was a problem processing your transaction.  Your SIFT could not be purchased at this time." + Environment.NewLine + Environment.NewLine + response.FailureReason);
+            else
+            {
+                TransactionToMine = _ethereumManager.EnqueueTransactionPendingReceipt(response.TransactionHash);
+                if (TransactionToMine == null)
+                    MessageBox.Show("Your transaction sent with hash " + response.TransactionHash + ", but we could not mine it to confirm the transaction.  Your balance should update shortly, but if not please retry the transaction after checking your Ethereum wallet.");
+                else
+                {
+                    // Hookup to wait to hear the status, or process it immediately if we have it
+                    TransactionToMine.PropertyChanged += OnTransactionToMinePropertyChanged;
+                    if (TransactionToMine.Completed)
+                        OnTransactionToMinePropertyChanged(TransactionToMine, new System.ComponentModel.PropertyChangedEventArgs(null));
+                }
+            }
 
             // Update the UI
             UpdateSiftPurchaseSettings();
@@ -361,8 +428,6 @@ namespace Lts.Sift.WinClient
             SiftInvestIsEnabled = SiftAmountToPurchase > 0;
         }
 
-        // Show some kind of activity indicator whilst purchase is in progress
-        // Logging writes to UI somewhere
         // Auto-update support built in
         // Installer
     }

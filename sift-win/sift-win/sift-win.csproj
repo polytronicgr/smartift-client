@@ -88,6 +88,7 @@
     <Compile Include="Converters\BoolToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\NullToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="EnqueuedTransaction.cs" />
     <Compile Include="EthereumAmount.cs" />
     <Compile Include="LogViewViewModel.cs" />
     <Compile Include="LogViewWindow.xaml.cs">

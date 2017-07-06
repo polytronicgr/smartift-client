@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Guytp.Logging;
+using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -41,6 +42,11 @@ namespace Lts.Sift.WinClient
                 _isExecuting = true;
                 RaiseCanExecuteChanged();
                 await _executeMethod(obj);
+            }
+            catch (Exception ex)
+            {
+                Logger.ApplicationInstance.Error("Unexpected exception processing AwaitableDelegateCommand", ex);
+                throw;
             }
             finally
             {
