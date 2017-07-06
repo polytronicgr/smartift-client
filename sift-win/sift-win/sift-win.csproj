@@ -78,64 +78,64 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseDragableWindow.cs" />
-    <Compile Include="BaseViewModel.cs" />
+    <Compile Include="Wpf Support\BaseDragableWindow.cs" />
+    <Compile Include="Wpf Support\BaseViewModel.cs" />
     <Compile Include="Commands\AwaitableDelegateCommand.cs" />
     <Compile Include="Commands\IAsyncCommand.cs" />
-    <Compile Include="ContractPhase.cs" />
+    <Compile Include="Ethereum\ContractPhase.cs" />
     <Compile Include="Commands\DelegateCommand.cs" />
     <Compile Include="Commands\IRaiseCanExecuteChanged.cs" />
     <Compile Include="Converters\BoolToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\NullToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
-    <Compile Include="EnqueuedTransaction.cs" />
-    <Compile Include="EthereumAmount.cs" />
-    <Compile Include="LogViewViewModel.cs" />
-    <Compile Include="LogViewWindow.xaml.cs">
+    <Compile Include="Ethereum\EnqueuedTransaction.cs" />
+    <Compile Include="Ethereum\EthereumAmount.cs" />
+    <Compile Include="UI and View Models\LogViewViewModel.cs" />
+    <Compile Include="UI and View Models\LogViewWindow.xaml.cs">
       <DependentUpon>LogViewWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PostIcoViewModel.cs" />
-    <Compile Include="PostIcoWindow.xaml.cs">
+    <Compile Include="UI and View Models\PostIcoViewModel.cs" />
+    <Compile Include="UI and View Models\PostIcoWindow.xaml.cs">
       <DependentUpon>PostIcoWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SiftApp.cs" />
     <Compile Include="SiftLogProvider.cs" />
-    <Compile Include="SiftPurchaseFailureType.cs" />
-    <Compile Include="SiftPurchaseResponse.cs" />
-    <Compile Include="SplashScreenViewModel.cs" />
-    <Compile Include="SplashScreenWindow.xaml.cs">
+    <Compile Include="Ethereum\SiftPurchaseFailureType.cs" />
+    <Compile Include="Ethereum\SiftPurchaseResponse.cs" />
+    <Compile Include="UI and View Models\SplashScreenViewModel.cs" />
+    <Compile Include="UI and View Models\SplashScreenWindow.xaml.cs">
       <DependentUpon>SplashScreenWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TransactionGasInfo.cs" />
-    <Compile Include="TransactionUnlockViewModel.cs" />
-    <Compile Include="TransactionUnlockWindow.xaml.cs">
+    <Compile Include="Ethereum\TransactionGasInfo.cs" />
+    <Compile Include="UI and View Models\TransactionUnlockViewModel.cs" />
+    <Compile Include="UI and View Models\TransactionUnlockWindow.xaml.cs">
       <DependentUpon>TransactionUnlockWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="IcoWindow.xaml">
+    <Page Include="UI and View Models\IcoWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="BasePropertyChangedObject.cs" />
-    <Compile Include="EthereumAccount.cs" />
-    <Compile Include="EthereumManager.cs" />
-    <Compile Include="IcoViewModel.cs" />
-    <Compile Include="IcoWindow.xaml.cs">
+    <Compile Include="Wpf Support\BasePropertyChangedObject.cs" />
+    <Compile Include="Ethereum\EthereumAccount.cs" />
+    <Compile Include="Ethereum\EthereumManager.cs" />
+    <Compile Include="UI and View Models\IcoViewModel.cs" />
+    <Compile Include="UI and View Models\IcoWindow.xaml.cs">
       <DependentUpon>IcoWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="LogViewWindow.xaml">
+    <Page Include="UI and View Models\LogViewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PostIcoWindow.xaml">
+    <Page Include="UI and View Models\PostIcoWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SplashScreenWindow.xaml">
+    <Page Include="UI and View Models\SplashScreenWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TransactionUnlockWindow.xaml">
+    <Page Include="UI and View Models\TransactionUnlockWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -175,5 +175,6 @@
   <ItemGroup>
     <Resource Include="Images\log.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
