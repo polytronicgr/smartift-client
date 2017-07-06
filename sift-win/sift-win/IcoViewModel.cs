@@ -339,16 +339,29 @@ namespace Lts.Sift.WinClient
                 return;
             }
 
+            // Determine maximum purchase volume - do the raw calculation then factor in gas to see if we need to take away one sift
+            uint maximumPurchaseVolume = (uint)(SelectedAccount.BalanceWei / EthereumManager.WeiPerSift);
+            decimal spendAmount = maximumPurchaseVolume * EthereumManager.WeiPerSift;
+            TransactionGasInfo gasInfo = _ethereumManager.CalculateGasCostForEtherSend(SelectedAccount.Address, EthereumManager.ContractAddress, spendAmount).Result;
+            decimal totalSpend = spendAmount + gasInfo.GasCost;
+            if (totalSpend > SelectedAccount.BalanceWei)
+            {
+                if (maximumPurchaseVolume == 1)
+                {
+                    SiftPurchaseIsVisible = false;
+                    return;
+                }
+                maximumPurchaseVolume--;
+            }
+
             // Setup the various settings for this account
             SiftPurchaseIsVisible = true;
-            SiftMaximumPurchase = (uint)(SelectedAccount.BalanceWei / EthereumManager.WeiPerSift);
+            SiftMaximumPurchase = maximumPurchaseVolume;
             SiftAmountToPurchase = SiftMaximumPurchase;
             SiftInvestIsEnabled = SiftAmountToPurchase > 0;
         }
 
         // Show some kind of activity indicator whilst purchase is in progress
-        // Ability to send double gas as a maximum if required
-        // Auto resolve not enough gas by purchasing one less
         // Logging writes to UI somewhere
         // Command line connect URL can be passed in
 

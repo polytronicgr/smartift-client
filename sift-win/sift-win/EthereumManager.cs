@@ -24,7 +24,7 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines the address of SIFT's contract.
         /// </summary>
-        private const string ContractAddress = "0xAeE66f6DDbFD69D40A0C0e524f18fb273FF6Aac9";
+        public const string ContractAddress = "0xAeE66f6DDbFD69D40A0C0e524f18fb273FF6Aac9";
 
         /// <summary>
         /// Defines whether or not the thread is alive that checks in the background.
@@ -283,6 +283,34 @@ namespace Lts.Sift.WinClient
         #endregion
 
         /// <summary>
+        /// Calculate details about how much gas it will cost for a transaction.
+        /// </summary>
+        /// <param name="from">
+        /// Where the data is being sent from.
+        /// </param>
+        /// <param name="to">
+        /// To whom the data is being sent.
+        /// </param>
+        /// <param name="wei">
+        /// The amount of wei to send.
+        /// </param>
+        /// <returns>
+        /// An object describing the costs involved in this transaction.
+        /// </returns>
+        public async Task<TransactionGasInfo> CalculateGasCostForEtherSend(string from, string to, decimal wei)
+        {
+            // See if we have enough gas, if not we'll fail it
+            HexBigInteger hexValue = new HexBigInteger(new System.Numerics.BigInteger(wei));
+            CallInput input = new CallInput { From = from, To = _contract.Address, Value = hexValue };
+            HexBigInteger rawGas = await _web3.Eth.Transactions.EstimateGas.SendRequestAsync(input);
+            decimal gas = decimal.Parse(rawGas.Value.ToString());
+            HexBigInteger rawGasPrice = await _web3.Eth.GasPrice.SendRequestAsync();
+            decimal gasPrice = decimal.Parse(rawGas.Value.ToString());
+            decimal gasCost = gas * gasPrice;
+            return new TransactionGasInfo(gasPrice, gasCost, gas);
+        }
+
+        /// <summary>
         /// Purchase SIFT from one of our accounts.
         /// </summary>
         /// <param name="address">
@@ -306,14 +334,11 @@ namespace Lts.Sift.WinClient
                 if (account.BalanceWei < purchaseCostWei)
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.InsufficientFunds, "The specified account does not have sufficient funds.");
 
-                // See if we have enough gas, if not we'll fail it
-                HexBigInteger hexValue = new HexBigInteger(new System.Numerics.BigInteger(purchaseCostWei));
-                CallInput input = new CallInput { From = address, To = _contract.Address, Value = hexValue };
-                HexBigInteger rawGas = await _web3.Eth.Transactions.EstimateGas.SendRequestAsync(input);
-                decimal gas = decimal.Parse(rawGas.Value.ToString());
-                HexBigInteger rawGasPrice = await _web3.Eth.GasPrice.SendRequestAsync();
-                decimal gasPrice = decimal.Parse(rawGas.Value.ToString());
-                decimal gasCost = gas * gasPrice;
+                // Determine the gas cost for this
+                TransactionGasInfo gasInfo = await CalculateGasCostForEtherSend(address, _contract.Address, purchaseCostWei);
+                decimal gasPrice = gasInfo.GasPrice;
+                decimal gasCost = gasInfo.GasCost;
+                decimal gas = gasInfo.Gas;
                 decimal remainingGasMoney = account.BalanceWei - purchaseCostWei;
                 if (remainingGasMoney < gasCost)
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.InsufficientGas, "You do not have enough gas for this transaction.");
@@ -346,7 +371,7 @@ namespace Lts.Sift.WinClient
                 {
                     From = address,
                     To = _contract.Address,
-                    Value = hexValue,
+                    Value = new HexBigInteger(new BigInteger(purchaseCostWei)),
                     GasPrice = new HexBigInteger(new BigInteger(viewModel.SelectedGasMultiplier * gasCost)),
                     Gas = new HexBigInteger(new BigInteger(viewModel.Gas))
                 };

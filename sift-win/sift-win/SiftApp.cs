@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using Guytp.Logging;
+using System;
+using System.Configuration;
+using System.Windows;
 
 namespace Lts.Sift.WinClient
 {
@@ -21,7 +24,16 @@ namespace Lts.Sift.WinClient
         public SiftApp()
         {
             // Create our ethereum manager thread that the UI will need
-            _ethereumManager = new EthereumManager();
+            string url = null;
+            try
+            {
+                string value = ConfigurationManager.AppSettings["Lts.Sift.WinClient.EthereumRpcUrl"];
+            }
+            catch (Exception ex)
+            {
+                Logger.ApplicationInstance.Error("Error parsing value for ethereum URL, will use default", ex);
+            }
+            _ethereumManager = new EthereumManager(string.IsNullOrEmpty(url) ? "http://localhost:8545/" : url);
         }
         #endregion
 

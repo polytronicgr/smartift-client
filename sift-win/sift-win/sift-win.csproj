@@ -57,6 +57,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Numerics" />
@@ -99,6 +100,7 @@
     <Compile Include="SplashScreenWindow.xaml.cs">
       <DependentUpon>SplashScreenWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TransactionGasInfo.cs" />
     <Compile Include="TransactionUnlockViewModel.cs" />
     <Compile Include="TransactionUnlockWindow.xaml.cs">
       <DependentUpon>TransactionUnlockWindow.xaml</DependentUpon>
