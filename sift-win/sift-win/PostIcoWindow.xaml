@@ -8,7 +8,7 @@
         IsEnabled="{Binding Path=IsUiEnabled}" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignData Type=local:PostIcoViewModel}"
         Title="Smart Investment Fund Token (SIFT)" SizeToContent="WidthAndHeight" 
-        Background="#4E8EE9" ResizeMode="NoResize" WindowStyle="None" MaxWidth="740" Height="500">
+        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None" MaxWidth="740" Height="500">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -22,7 +22,7 @@
             <Image Source="Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" MaxWidth="720" />
         </Border>
 
-        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="32" Foreground="White" Text="Post-ICO support is not available in this version, please download the latest version from smartift.com" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="32" Foreground="Black" Text="Post-ICO support is not available in this version, please download the latest version from smartift.com" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
 
         <Button Grid.Row="3" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="10" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" VerticalAlignment="Bottom" />
     </Grid>

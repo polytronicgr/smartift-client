@@ -75,6 +75,11 @@ namespace Lts.Sift.WinClient
         /// Defines the interface to the ERC20 part of the SIFT contract
         /// </summary>
         private readonly StandardTokenService _tokenService;
+
+        /// <summary>
+        /// Defines an object containing default gas info for sending some gas from an account to the contract with some wei to use as a rule-of-thumb.
+        /// </summary>
+        private TransactionGasInfo _defaultGasInfo;
         #endregion
 
         #region Properties
@@ -162,6 +167,21 @@ namespace Lts.Sift.WinClient
         /// Gets how many wei translate to a single sift.
         /// </summary>
         public static decimal WeiPerSift { get { return 1 * 10000000000000000; } }
+
+        /// <summary>
+        /// Gets or sets an object defining the gas to send some ether to the contract.
+        /// </summary>
+        public TransactionGasInfo DefaultGasInfo
+        {
+            get { return _defaultGasInfo; }
+            private set
+            {
+                if (_defaultGasInfo == value)
+                    return;
+                _defaultGasInfo = value;
+                NotifyPropertyChanged();
+            }
+        }
         #endregion
 
         #region Constructors
@@ -251,6 +271,9 @@ namespace Lts.Sift.WinClient
                         {
                             bool isIcoPhase = _contract.GetFunction("icoPhase").CallAsync<bool>().Result;
                             ContractPhase = isIcoPhase ? ContractPhase.Ico : ContractPhase.Trading;
+
+                            // Whilst we're here we also want to check the gas cost to send
+                            DefaultGasInfo = CalculateGasCostForEtherSend("0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", ContractAddress, 1000000000000000000m).Result;
                         }
                         else
                             ContractPhase = ContractPhase.Unknown;

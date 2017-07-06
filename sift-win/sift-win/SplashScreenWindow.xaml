@@ -8,7 +8,7 @@
         IsEnabled="{Binding Path=IsUiEnabled}"
         d:DataContext="{d:DesignData Type=local:SplashScreenViewModel}"
         Title="Smart Investment Fund Token (SIFT)" WindowStartupLocation="CenterScreen"
-        Background="#4E8EE9" ResizeMode="NoResize" WindowStyle="None" Width="420" Height="200">
+        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None" Width="420" Height="200">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Window.Resources>
@@ -26,7 +26,7 @@
             <Image Source="Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" Width="400" />
         </Border>
 
-        <TextBlock Grid.Row="1" FontSize="16" Foreground="White" Text="{Binding Path=StatusText,FallbackValue='Status text goes here on the splashscreen...'}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+        <TextBlock Grid.Row="1" FontSize="16" Foreground="Black" Text="{Binding Path=StatusText,FallbackValue='Status text goes here on the splashscreen...'}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
 
         <Button Grid.Row="2" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="10" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" Visibility="{Binding Path=IsExitButtonVisible, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}" VerticalAlignment="Bottom" />
     </Grid>

@@ -342,7 +342,7 @@ namespace Lts.Sift.WinClient
             // Determine maximum purchase volume - do the raw calculation then factor in gas to see if we need to take away one sift
             uint maximumPurchaseVolume = (uint)(SelectedAccount.BalanceWei / EthereumManager.WeiPerSift);
             decimal spendAmount = maximumPurchaseVolume * EthereumManager.WeiPerSift;
-            TransactionGasInfo gasInfo = _ethereumManager.CalculateGasCostForEtherSend(SelectedAccount.Address, EthereumManager.ContractAddress, spendAmount).Result;
+            TransactionGasInfo gasInfo = _ethereumManager.DefaultGasInfo;
             decimal totalSpend = spendAmount + gasInfo.GasCost;
             if (totalSpend > SelectedAccount.BalanceWei)
             {
@@ -363,7 +363,6 @@ namespace Lts.Sift.WinClient
 
         // Show some kind of activity indicator whilst purchase is in progress
         // Logging writes to UI somewhere
-        // Command line connect URL can be passed in
 
         // Auto-update support built in
         // Installer
