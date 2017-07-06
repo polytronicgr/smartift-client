@@ -60,6 +60,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
@@ -81,6 +82,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api Client\ApiClient.cs" />
+    <Compile Include="Api Client\AuthenticationClient.cs" />
+    <Compile Include="Api Client\ProductClient.cs" />
     <Compile Include="Wpf Support\BaseDragableWindow.cs" />
     <Compile Include="Wpf Support\BaseViewModel.cs" />
     <Compile Include="Commands\AwaitableDelegateCommand.cs" />

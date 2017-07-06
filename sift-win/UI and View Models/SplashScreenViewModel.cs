@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Guytp.Logging;
+using System;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 
@@ -113,6 +115,45 @@ namespace Lts.Sift.WinClient
         /// </summary>
         private void ThreadEntry()
         {
+            // Always check for updates first
+            StatusText = "Checking for updates to sift-win...";
+            try
+            {
+                // Login to update API
+                Logger.ApplicationInstance.Debug("Checking for updated version of SIFT");
+                AuthenticationClient authClient = new AuthenticationClient();
+                AuthenticateUserResponse authResponse = authClient.AuthenticateJwtAsync(new AuthenticateUserRequest
+                {
+                    Username = "sift-win-updatecheck",
+                    Password = "exXzzgY3AEANtg8V"
+                }).Result;
+                if (authResponse == null)
+                    throw new Exception("Null response when checking authentication details");
+
+                // Call to get latest summary information
+                ProductClient client = new ProductClient();
+                ProductSummaryResponse response = client.ProductSummaryGetAsync("D7682386-897C-4798-84B3-911EDEB8BD44", "BEARER " + authResponse?.JsonWebToken).Result;
+                if (response == null)
+                    throw new Exception("Null response when checking product details");
+
+                // Determine any changes to state an update UI accordingly
+                Logger.ApplicationInstance.Debug("Latest version is " + response.LatestVersion + " from " + response.LatestDownloadUrl);
+                if (!string.IsNullOrEmpty(response.LatestVersion))
+                {
+                    Logger.ApplicationInstance.Info("A new version of SIFT - version " + response.LatestVersion + " is available from " + response.LatestDownloadUrl);
+                    Version version = Version.Parse(response.LatestVersion);
+                    if (Assembly.GetEntryAssembly().GetName().Version < version && MessageBox.Show("A new version of SIFT is available (" + version + ").  Would you like to download it now?", "Smart Investment Fund Token (SIFT)", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        System.Diagnostics.Process.Start(string.IsNullOrWhiteSpace(response.LatestDownloadUrl) ? "http://smartift.com/sift-win/latest" : response.LatestDownloadUrl);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.ApplicationInstance.Error("Failed to check for latest version", ex);
+            }
+            finally
+            {
+            }
+
             DateTime started = DateTime.UtcNow;
             while (_isAlive)
             {
