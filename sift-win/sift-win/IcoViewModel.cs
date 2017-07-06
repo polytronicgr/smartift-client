@@ -427,8 +427,5 @@ namespace Lts.Sift.WinClient
             SiftAmountToPurchase = SiftMaximumPurchase;
             SiftInvestIsEnabled = SiftAmountToPurchase > 0;
         }
-
-        // Auto-update support built in
-        // Installer
     }
 }
