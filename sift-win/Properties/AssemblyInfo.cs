@@ -7,12 +7,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SIFT Windows Client")]
+[assembly: AssemblyTitle("Smart Investment Fund Token (SIFT)")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Smart Investment Fund")]
-[assembly: AssemblyProduct("SIFT")]
-[assembly: AssemblyCopyright("Copyright © SIFT 2017")]
+[assembly: AssemblyCompany("SIFT LLC")]
+[assembly: AssemblyProduct("Smart Investment Fund Token (SIFT)")]
+[assembly: AssemblyCopyright("Copyright © SIFT LLC 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

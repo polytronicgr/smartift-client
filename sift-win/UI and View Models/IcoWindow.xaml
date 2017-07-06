@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Lts.Sift.WinClient"
+        Icon="../sift.ico"
         mc:Ignorable="d"
         IsEnabled="{Binding Path=IsUiEnabled}" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignData Type=local:IcoViewModel}"

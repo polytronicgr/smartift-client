@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="Smart Investment Fund Token (SIFT)" Language="1033" Version="1.0.0" Manufacturer="SIFT LLC" UpgradeCode="a4396d92-cd5f-459b-9b02-1cf6f88934c9">
+    <Package InstallerVersion="200" Description="The SIFT Windows GUI provides easy access to manage your SIFT shareholding." Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated" Manufacturer="SIFT LLC" />
+
+    <!-- Single CAB used to store all contents -->
+    <Media Id="1" Cabinet="SiftWin.cab" EmbedCab="yes" />
+
+    <!-- The core component includes everything required for MetaTrader -->
+    <Feature Id="CoreFeature" Title="Core Functionality" Level="1">
+      <ComponentGroupRef Id="UiComponent" />
+      <ComponentGroupRef Id="IconCreationComponent" />
+    </Feature>
+
+    <!--
+    <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    -->
+    
+    <InstallExecuteSequence>
+      <RemoveExistingProducts Before="InstallInitialize" />
+      <Custom Action="LaunchApplication" After="InstallFinalize" />
+    </InstallExecuteSequence>
+
+    <Icon Id="SIFT_ICO" SourceFile="..\sift-win\sift.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="SIFT_ICO" />
+
+    <CustomAction Id="LaunchApplication" Directory="INSTALLFOLDER" Impersonate="yes" ExeCommand="[SystemFolder]cmd.exe /C start sift-win.exe" />
+
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="Smart Investment Fund Token (SIFT)" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="STARTMENUFOLDER" Name="Smart Investment Fund Token (SIFT)"/>
+      </Directory>
+    </Directory>
+
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="UiComponent" Directory="INSTALLFOLDER">
+      <Component Id="crypto.dll" Guid="*">
+        <File Id="crypto.dll" KeyPath="yes" Source="$(var.SolutionDir)\sift-win\bin\$(var.Configuration)\crypto.dll" />
+      </Component>
+      <Component Id="EdjCase.JsonRpc.Client.dll" Guid="*">
+        <File Id="EdjCase.JsonRpc.Client.dll" KeyPath="yes" Source="$(var.SolutionDir)\sift-win\bin\$(var.Configuration)\EdjCase.JsonRpc.Client.dll" />
+      </Component>
+      <Component Id="EdjCase.JsonRpc.Core.dll" Guid="*">
+        <File Id="EdjCase.JsonRpc.Core.dll" KeyPath="yes" Source="$(var.SolutionDir)\sift-win\bin\$(var.Configuration)\EdjCase.JsonRpc.Core.dll" />
+      </Component>
+      <Component Id="Guytp.Logging.dll" Guid="*">
+        <File Id="Guytp.Logging.dll" KeyPath="yes" Source="$(var.SolutionDir)\sift-win\bin\$(var.Configuration)\Guytp.Logging.dll" />
+      </Component>
+      <Component Id="Nethereum.Portable.dll" Guid="*">
+        <File Id="Nethereum.Portable.dll" KeyPath="yes" Source="$(var.SolutionDir)\sift-win\bin\$(var.Configuration)\Nethereum.Portable.dll" />
+      </Component>
+      <Component Id="Newtonsoft.Json.dll" Guid="*">
+        <File Id="Newtonsoft.Json.dll" KeyPath="yes" Source="$(var.SolutionDir)\sift-win\bin\$(var.Configuration)\Newtonsoft.Json.dll" />
+      </Component>
+      <Component Id="siftwin.exe" Guid="*">
+        <File Id="siftwin.exe" KeyPath="yes" Source="$(var.SolutionDir)\sift-win\bin\$(var.Configuration)\sift-win.exe" />
+      </Component>
+      <Component Id="siftwin.exe.config" Guid="*">
+        <File Id="siftwin.exe.config" KeyPath="yes" Source="$(var.SolutionDir)\sift-win\bin\$(var.Configuration)\sift-win.exe.config" />
+      </Component>
+      <Component Id="System.Runtime.InteropServices.RuntimeInformation.dll" Guid="*">
+        <File Id="System.Runtime.InteropServices.RuntimeInformation.dll" KeyPath="yes" Source="$(var.SolutionDir)\sift-win\bin\$(var.Configuration)\System.Runtime.InteropServices.RuntimeInformation.dll" />
+      </Component>
+    </ComponentGroup>
+    <ComponentGroup Id="IconCreationComponent" Directory="STARTMENUFOLDER">
+      <Component Id="ApplicationShortcut" Guid="5c136b20-e964-4bb2-b138-87a20d0d1856">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="Smart Investment Fund Token (SIFT)"
+                  Description="Smart Investment Fund Token (SIFT)"
+                  Target="[#siftwin.exe]"
+                  WorkingDirectory="INSTALLFOLDER"/>
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\SIFT LLC\Smart Investment Fund Token (SIFT)" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -62,7 +62,6 @@ namespace Lts.Sift.WinClient
         /// </param>
         private static void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            e.Handled = true;
             HandleFatalException(e.Exception);
         }
 
