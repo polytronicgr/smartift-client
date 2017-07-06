@@ -17,6 +17,15 @@ namespace Lts.Sift.WinClient
         {
             try
             {
+                SiftLogProvider logProvider = new SiftLogProvider(new LogLevel[] { LogLevel.Debug, LogLevel.Error, LogLevel.Info, LogLevel.Warning });
+                Logger.ApplicationInstance.AddLogProvider(logProvider);
+            }
+            catch
+            {
+                // Intentionall swallowed as we don't have logging yet
+            }
+            try
+            {
                 SiftApp app = new SiftApp();
                 app.DispatcherUnhandledException += OnDispatcherUnhandledException;
                 AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;

@@ -27,6 +27,11 @@ namespace Lts.Sift.WinClient
         public const string ContractAddress = "0xAeE66f6DDbFD69D40A0C0e524f18fb273FF6Aac9";
 
         /// <summary>
+        /// Defines the version of the contract we are expecting.
+        /// </summary>
+        public const string ContractVersion = "SIFT 201707051557";
+
+        /// <summary>
         /// Defines whether or not the thread is alive that checks in the background.
         /// </summary>
         private bool _isAlive;
@@ -190,6 +195,9 @@ namespace Lts.Sift.WinClient
         /// </summary>
         public EthereumManager(string url = "http://localhost:8545/")
         {
+            // Log this start
+            Logger.ApplicationInstance.Info("Starting EthereumManager against " + url);
+
             // Create basic objects we'll need
             _web3 = new Web3(url);
             Accounts = new ObservableCollection<EthereumAccount>();
@@ -203,6 +211,7 @@ namespace Lts.Sift.WinClient
                 abi = reader.ReadToEnd();
             if (string.IsNullOrEmpty(abi))
                 throw new Exception("Error reading contract ABI");
+            Logger.ApplicationInstance.Debug("ABI loaded successfully for contract at " + ContractAddress);
 
             // Store a handle to our contract
             _contract = _web3.Eth.GetContract(abi, ContractAddress);
@@ -221,6 +230,8 @@ namespace Lts.Sift.WinClient
         /// </summary>
         private void ThreadEntry()
         {
+            Logger.ApplicationInstance.Info("Network status thread started");
+            bool connectedYet = false;
             DateTime nextContractCheckTime = DateTime.UtcNow;
             while (_isAlive)
             {
@@ -248,13 +259,22 @@ namespace Lts.Sift.WinClient
                             // See if we have an existing account - if not we'll need to create a new one
                             EthereumAccount existingAccount = Accounts.FirstOrDefault(ac => ac.Address == address);
                             if (existingAccount == null)
+                            {
                                 Accounts.Add(new EthereumAccount(address, balance, siftBalance));
+                                Logger.ApplicationInstance.Info("Found new account " + address + " with " + balance + " ETH / " + siftBalance + " SIFT");
+                            }
                             else
                             {
                                 if (existingAccount.BalanceWei != balance)
+                                {
                                     existingAccount.BalanceWei = balance;
+                                    Logger.ApplicationInstance.Info("Account " + address + " now has " + balance + " ETH");
+                                }
                                 if (existingAccount.SiftBalance != siftBalance)
+                                {
                                     existingAccount.SiftBalance = siftBalance;
+                                    Logger.ApplicationInstance.Info("Account " + address + " now has " + siftBalance + " SIFT");
+                                }
                             }
                         }
                     }
@@ -266,23 +286,29 @@ namespace Lts.Sift.WinClient
                     // Ask the contract our status but first check we've got the right contract
                     if (DateTime.UtcNow >= nextContractCheckTime)
                     {
+                        Logger.ApplicationInstance.Debug("Checking contract version");
                         string contractVersion = _contract.GetFunction("siftContractVersion").CallAsync<string>().Result;
-                        if (contractVersion == "SIFT 201707051557")
+                        if (contractVersion == ContractVersion)
                         {
                             bool isIcoPhase = _contract.GetFunction("icoPhase").CallAsync<bool>().Result;
                             ContractPhase = isIcoPhase ? ContractPhase.Ico : ContractPhase.Trading;
 
                             // Whilst we're here we also want to check the gas cost to send
                             DefaultGasInfo = CalculateGasCostForEtherSend("0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", ContractAddress, 1000000000000000000m).Result;
+                            Logger.ApplicationInstance.Error("Default gas calculating for sending as " + DefaultGasInfo.Gas + " at " + DefaultGasInfo.GasPrice + " = " + DefaultGasInfo.GasCost);
                         }
                         else
+                        {
                             ContractPhase = ContractPhase.Unknown;
+                            Logger.ApplicationInstance.Error("Contract mismatch - expected " + ContractVersion + " but got " + contractVersion + " at " + ContractAddress);
+                        }
                         nextContractCheckTime = DateTime.UtcNow.AddSeconds(10);
                     }
 
                     // If valid contract check total supply
                     if (ContractPhase != ContractPhase.Unknown)
                     {
+                        Logger.ApplicationInstance.Debug("Checking total supply and shareholding");
                         TotalSupply = _tokenService.GetTotalSupplyAsync<ulong>().Result;
                         foreach (EthereumAccount account in Accounts)
                             account.ShareholdingPercentage = TotalSupply == 0 ? 0 : (decimal)account.SiftBalance / TotalSupply * 100;
@@ -290,17 +316,22 @@ namespace Lts.Sift.WinClient
 
                     // Signify a successful loop
                     LastChecksSuccessful = true;
-
-                    // Wait to try again
-                    DateTime nextTime = DateTime.UtcNow.AddSeconds(3);
-                    while (DateTime.UtcNow < nextTime && _isAlive)
-                        Thread.Sleep(100);
+                    if (!connectedYet)
+                    {
+                        connectedYet = true;
+                        Logger.ApplicationInstance.Info("Completed first successful network check, we should be good to go");
+                    }
                 }
                 catch (Exception ex)
                 {
                     LastChecksSuccessful = false;
                     Logger.ApplicationInstance.Error("There was an unexpected error updating Ethereum network information", ex);
                 }
+
+                // Wait to try again
+                DateTime nextTime = DateTime.UtcNow.AddSeconds(3);
+                while (DateTime.UtcNow < nextTime && _isAlive)
+                    Thread.Sleep(100);
             }
         }
         #endregion
@@ -371,6 +402,7 @@ namespace Lts.Sift.WinClient
                     gasMultiple--;
 
                 // Prompt to unlock account
+                Logger.ApplicationInstance.Debug("Asking user confirmation for sending " + purchaseCostWei + " from " + address + " to " + ContractAddress);
                 Func<TransactionUnlockViewModel> fnc = new Func<TransactionUnlockViewModel>(() =>
                     {
                         TransactionUnlockViewModel vm = new TransactionUnlockViewModel(gasCost, gasMultiple, gas, address, _contract.Address, purchaseCostWei);
@@ -386,10 +418,12 @@ namespace Lts.Sift.WinClient
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.UserCancelled, "User cancelled transaction on confirmation screen.");
 
                 // Unlock the account
+                Logger.ApplicationInstance.Debug("Attempting to unlock " + address);
                 if (!await _web3.Personal.UnlockAccount.SendRequestAsync(address, viewModel.Password == null ? string.Empty : viewModel.Password.ToString(), 120))
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.UnlockError, "Unable to unlock account with the supplied password.");
 
                 // Send and mine the transaction
+                Logger.ApplicationInstance.Debug("Account unlocked, sending " + purchaseCostWei + " from " + address + " to " + ContractAddress);
                 TransactionInput transactionInput = new TransactionInput
                 {
                     From = address,
@@ -399,11 +433,12 @@ namespace Lts.Sift.WinClient
                     Gas = new HexBigInteger(new BigInteger(viewModel.Gas))
                 };
                 string transactionHash = await _web3.Eth.Transactions.SendTransaction.SendRequestAsync(transactionInput);
+                Logger.ApplicationInstance.Info("Send transaction for " + purchaseCostWei + " to " + ContractAddress + " from " + address);
                 TransactionReceipt receipt = await MineAndGetReceiptAsync(transactionHash);
                 if (receipt == null)
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.NoReceipt, "The transaction was performed but we could not mine the receipt, please manually start your miner in your wallet to ensure the transaction is sent to the network");
 
-                // Return the response
+                // Return the success response
                 return new SiftPurchaseResponse();
             }
             catch (Exception ex)
@@ -430,6 +465,7 @@ namespace Lts.Sift.WinClient
             bool startedMiner = false;
             try
             {
+                Logger.ApplicationInstance.Debug("Attempting to start miner");
                 if (!await _web3.Miner.Start.SendRequestAsync(1))
                     Logger.ApplicationInstance.Error("Mining start failed");
                 startedMiner = true;
@@ -440,11 +476,13 @@ namespace Lts.Sift.WinClient
                 return null;
             }
             TransactionReceipt receipt;
+            Logger.ApplicationInstance.Info("Getting receipt for transaction " + transactionHash);
             while ((receipt = await _web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(transactionHash)) == null)
                 Thread.Sleep(1000);
             if (startedMiner)
                 try
                 {
+                    Logger.ApplicationInstance.Debug("Attempting to stop miner");
                     if (!await _web3.Miner.Stop.SendRequestAsync())
                         Logger.ApplicationInstance.Error("Stopping mining failed");
                 }

@@ -26,6 +26,11 @@ namespace Lts.Sift.WinClient
         public ICommand ExitCommand { get; private set; }
 
         /// <summary>
+        /// Gets the command to display the log window.
+        /// </summary>
+        public ICommand LogViewCommand { get; private set; }
+
+        /// <summary>
         /// Gets or sets whether or not the UI is enabled.
         /// </summary>
         public bool IsUiEnabled
@@ -51,6 +56,7 @@ namespace Lts.Sift.WinClient
         protected BaseViewModel(EthereumManager ethereumManager)
         {
             ExitCommand = new DelegateCommand(Exit);
+            LogViewCommand = new DelegateCommand(LogView);
             IsUiEnabled = true;
             _ethereumManager = ethereumManager;
         }
@@ -64,6 +70,14 @@ namespace Lts.Sift.WinClient
         {
             IsUiEnabled = false;
             System.Windows.Application.Current.Shutdown();
+        }
+
+        /// <summary>
+        /// Displays the log view window in a modal dialog.
+        /// </summary>
+        private void LogView()
+        {
+            new LogViewWindow { DataContext = new LogViewViewModel() }.ShowDialog();
         }
         #endregion
     }

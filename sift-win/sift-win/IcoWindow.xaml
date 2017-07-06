@@ -99,5 +99,8 @@
 
         <!-- Buttons -->
         <Button Grid.Row="3" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="0,10,0,0" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" />
+        <Button Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left" Margin="0,10,0,0" Padding="0" Command="{Binding Path=LogViewCommand}" Background="Transparent" BorderThickness="0">
+            <Image Source="Images/log.png" Width="32" Stretch="UniformToFill" StretchDirection="DownOnly" />
+        </Button>
     </Grid>
 </local:BaseDragableWindow>

@@ -89,11 +89,16 @@
     <Compile Include="Converters\NullToInverseVisibilityConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="EthereumAmount.cs" />
+    <Compile Include="LogViewViewModel.cs" />
+    <Compile Include="LogViewWindow.xaml.cs">
+      <DependentUpon>LogViewWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PostIcoViewModel.cs" />
     <Compile Include="PostIcoWindow.xaml.cs">
       <DependentUpon>PostIcoWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SiftApp.cs" />
+    <Compile Include="SiftLogProvider.cs" />
     <Compile Include="SiftPurchaseFailureType.cs" />
     <Compile Include="SiftPurchaseResponse.cs" />
     <Compile Include="SplashScreenViewModel.cs" />
@@ -117,6 +122,10 @@
       <DependentUpon>IcoWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="LogViewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PostIcoWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -161,6 +170,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\header.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\log.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

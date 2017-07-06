@@ -363,7 +363,6 @@ namespace Lts.Sift.WinClient
 
         // Show some kind of activity indicator whilst purchase is in progress
         // Logging writes to UI somewhere
-
         // Auto-update support built in
         // Installer
     }

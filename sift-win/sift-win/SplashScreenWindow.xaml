@@ -28,6 +28,9 @@
 
         <TextBlock Grid.Row="1" FontSize="16" Foreground="Black" Text="{Binding Path=StatusText,FallbackValue='Status text goes here on the splashscreen...'}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
 
+        <Button Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" Margin="0,10,0,0" Padding="0" Command="{Binding Path=LogViewCommand}" Background="Transparent" BorderThickness="0" Visibility="{Binding Path=IsExitButtonVisible, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+            <Image Source="Images/log.png" Width="32" Stretch="UniformToFill" StretchDirection="DownOnly" />
+        </Button>
         <Button Grid.Row="2" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="10" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" Visibility="{Binding Path=IsExitButtonVisible, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}" VerticalAlignment="Bottom" />
     </Grid>
 </local:BaseDragableWindow>
