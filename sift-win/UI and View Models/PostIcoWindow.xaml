@@ -20,7 +20,7 @@
         </Grid.ColumnDefinitions>
 
         <Border Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,0,0,30">
-            <Image Source="Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" MaxWidth="720" />
+            <Image Source="../Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" MaxWidth="720" />
         </Border>
 
         <TextBlock Grid.Row="1" Grid.Column="1" FontSize="32" Foreground="Black" Text="Post-ICO support is not available in this version, please download the latest version from smartift.com" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />

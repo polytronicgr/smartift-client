@@ -155,6 +155,7 @@ namespace Lts.Sift.WinClient
             }
 
             DateTime started = DateTime.UtcNow;
+            StatusText = MessageConnecting;
             while (_isAlive)
             {
                 // Break out of loop if we know what we're doing
