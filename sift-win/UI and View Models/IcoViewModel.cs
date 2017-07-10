@@ -24,11 +24,6 @@ namespace Lts.Sift.WinClient
         private bool _isAccountSelectionVisible;
 
         /// <summary>
-        /// Defines whether or not the purchase section is visible.
-        /// </summary>
-        private bool _siftPurchaseIsVisible;
-
-        /// <summary>
         /// Defines the cost to purchase the currently selected quantity of SIFT.
         /// </summary>
         private decimal _siftCostToPurchase;
@@ -115,21 +110,6 @@ namespace Lts.Sift.WinClient
                 if (_isAccountSelectionVisible == value)
                     return;
                 _isAccountSelectionVisible = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Gets whether or not the purchase section is visible.
-        /// </summary>
-        public bool SiftPurchaseIsVisible
-        {
-            get { return _siftPurchaseIsVisible; }
-            private set
-            {
-                if (_siftPurchaseIsVisible == value)
-                    return;
-                _siftPurchaseIsVisible = value;
                 NotifyPropertyChanged();
             }
         }
@@ -449,7 +429,9 @@ namespace Lts.Sift.WinClient
             // If we haven't got an account or no balance, hide the buy section
             if (SelectedAccount == null || SelectedAccount.BalanceWei < EthereumManager.WeiPerSift)
             {
-                SiftPurchaseIsVisible = false;
+                SiftMaximumPurchase = 0;
+                SiftAmountToPurchase = 0;
+                SiftInvestIsEnabled = false;
                 return;
             }
 
@@ -462,17 +444,18 @@ namespace Lts.Sift.WinClient
             {
                 if (maximumPurchaseVolume == 1)
                 {
-                    SiftPurchaseIsVisible = false;
+                    SiftMaximumPurchase = 0;
+                    SiftAmountToPurchase = 0;
+                    SiftInvestIsEnabled = false;
                     return;
                 }
                 maximumPurchaseVolume--;
             }
 
             // Setup the various settings for this account
-            SiftPurchaseIsVisible = true;
             SiftMaximumPurchase = maximumPurchaseVolume;
             SiftAmountToPurchase = SiftMaximumPurchase;
-            SiftInvestIsEnabled = SiftAmountToPurchase > 0;
+            SiftInvestIsEnabled = SiftMaximumPurchase > 0;
         }
     }
 }
