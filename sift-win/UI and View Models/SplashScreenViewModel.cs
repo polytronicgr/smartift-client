@@ -163,7 +163,7 @@ namespace Lts.Sift.WinClient
                 {
                     Logger.ApplicationInstance.Info("A new version of SIFT - version " + response.LatestVersion + " is available from " + response.LatestDownloadUrl);
                     Version version = Version.Parse(response.LatestVersion);
-                    //if (!System.Diagnostics.Debugger.IsAttached)
+                    if (!System.Diagnostics.Debugger.IsAttached)
                         if (Assembly.GetEntryAssembly().GetName().Version < version && SiftDialog.ShowDialog("SIFT Upgrade Available", "A new version of SIFT is available (" + version + ").  Would you like to download it now?", true).Value)
                             System.Diagnostics.Process.Start(string.IsNullOrWhiteSpace(response.LatestDownloadUrl) ? "http://smartift.com/sift-win/latest" : response.LatestDownloadUrl);
                 }
