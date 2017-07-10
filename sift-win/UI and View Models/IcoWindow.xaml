@@ -54,7 +54,7 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
                 <TextBlock FontSize="32" Foreground="Black" Text="{Binding Path=SelectedAccount.Balance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="10,0,10,0" VerticalAlignment="Center" />
                 <TextBlock FontSize="32" Foreground="Black" Text="{Binding Path=SelectedAccount.BalanceUnit,FallbackValue='ether'}" HorizontalAlignment="Center" Margin="10,0,30,0" VerticalAlignment="Center" />
-                <TextBlock FontSize="32" Foreground="Black" Text="{Binding Path=SelectedAccount.SiftBalance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="30,0,10,0" VerticalAlignment="Center" />
+                <TextBlock FontSize="32" Foreground="Black" Text="{Binding Path=SelectedAccount.SiftBalance,FallbackValue='&#x221e;', StringFormat={}{0:N0}}" HorizontalAlignment="Center" Margin="30,0,10,0" VerticalAlignment="Center" />
                 <TextBlock FontSize="32" Foreground="Black" Text="SIFT" HorizontalAlignment="Center" Margin="0,0,10,0" VerticalAlignment="Center" />
             </StackPanel>
 
@@ -73,7 +73,7 @@
                 <StackPanel Orientation="Vertical" Visibility="{Binding Path=SiftPurchaseIsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBlock Grid.ColumnSpan="4" TextWrapping="Wrap" Foreground="Black" FontSize="16">
                     <Run Text="You can invest in SIFT using the slider below - just slide it right to show how many SIFT you want to buy then press the buy button.  There are currently" />
-                    <Run Text="{Binding Path=TotalSiftIssued, Mode=OneWay, FallbackValue=0}" />
+                    <Run Text="{Binding Path=TotalSiftIssued, Mode=OneWay, FallbackValue=0, StringFormat={}{0:N0}}" />
                     <Run Text="SIFT issued in total." />
                     </TextBlock>
                     <Grid Margin="0,10,0,0">
@@ -86,7 +86,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding Path=SiftCostToPurchase, StringFormat={}{0:0.00} ether, FallbackValue='0.00 eth'}" FontSize="16" Foreground="Black" VerticalAlignment="Center" />
                         <Slider Grid.Column="1" Minimum="0" Maximum="{Binding Path=SiftMaximumPurchase, FallbackValue=100}" Value="{Binding Path=SiftAmountToPurchase}" Margin="10,0,10,0" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" Text="{Binding Path=SiftAmountToPurchase, StringFormat={}{0:0} SIFT, FallbackValue='0 SIFT'}" FontSize="16" Foreground="Black" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Text="{Binding Path=SiftAmountToPurchase, StringFormat={}{0:N0} SIFT, FallbackValue='0 SIFT'}" FontSize="16" Foreground="Black" VerticalAlignment="Center" />
                         <StackPanel Orientation="Vertical" Grid.Column="3" Margin="10,0,0,0">
                             <Button Content="+" Command="{Binding Path=SiftIncreaseQuantityCommand}" IsEnabled="{Binding Path=SiftIncreaseQuantityIsEnabled}" Width="20" Height="20" />
                             <Button Content="-" Command="{Binding Path=SiftDecreaseQuantityCommand}" IsEnabled="{Binding Path=SiftDecreaseQuantityIsEnabled}" Width="20" Height="20" />
