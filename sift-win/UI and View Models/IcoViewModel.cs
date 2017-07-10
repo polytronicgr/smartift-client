@@ -62,6 +62,16 @@ namespace Lts.Sift.WinClient
         /// Defines the transaction currently being mined after a purchase, if one is set.
         /// </summary>
         private EnqueuedTransaction _transactionToMine;
+
+        /// <summary>
+        /// Defines the dialog that is shown when a transaction is being confirmed.
+        /// </summary>
+        private SiftDialog _miningTransactionDialog;
+
+        /// <summary>
+        /// Defines the view model for the transaction confirmation popup.
+        /// </summary>
+        private SiftDialogViewModel _miningTransactionDialogViewModel;
         #endregion
 
         #region Properties
@@ -138,7 +148,7 @@ namespace Lts.Sift.WinClient
                 NotifyPropertyChanged();
             }
         }
-        
+
         /// <summary>
         /// Gets the maximum volume of SIFT that can be purchased with the current balance.
         /// </summary>
@@ -304,19 +314,27 @@ namespace Lts.Sift.WinClient
             if (!transaction.Completed)
                 return;
 
-            // Clear out the transaction to mine
+            // Clear out the transaction to mine and our dialog
             TransactionToMine = null;
+            SiftDialogViewModel viewModel = _miningTransactionDialogViewModel;
+            _miningTransactionDialogViewModel = null;
+            _miningTransactionDialog = null;
 
             // Display a message accordingly
+            viewModel.IsReturnButtonVisible = true;
             if (transaction.WasSuccessful)
             {
                 Logger.ApplicationInstance.Info("Purchase of SIFT added to block " + transaction.Receipt.BlockNumber.Value.ToString() + " for " + transaction.Receipt.TransactionHash + " at index " + transaction.Receipt.TransactionIndex.Value.ToString());
-                SiftDialog.ShowDialog("SIFT Purchase Successful", "Congratulations!  Your transaction for the purchase of SIFT has gone onto the Ethereum network.  Your new balance will be updated shortly and will be reflected in your Ethereum wallet.");
+                viewModel.Title = "SIFT Purchase Successful";
+                viewModel.Message = "Congratulations!  Your transaction for the purchase of SIFT has gone onto the Ethereum network.  Your new balance will be updated shortly and will be reflected in your Ethereum wallet.";
+                viewModel.IsSiftLogoVisible = true;
+                viewModel.IsEthereumAnimatedLogoVisible = false;
             }
             else
             {
                 Logger.ApplicationInstance.Error("TransactionToMine failed with message.  " + transaction.ErrorDetails);
-                SiftDialog.ShowDialog("Problem Purchasing SIFT", "There was a problem processing your transaction for SIFT.  " + transaction.ErrorDetails, false, true);
+                viewModel.Title = "Problem Purchasing SIFT";
+                viewModel.Message = "There was a problem processing your transaction for SIFT.  " + transaction.ErrorDetails;
             }
         }
 
@@ -390,9 +408,30 @@ namespace Lts.Sift.WinClient
                 else
                 {
                     // Hookup to wait to hear the status, or process it immediately if we have it
-                    TransactionToMine.PropertyChanged += OnTransactionToMinePropertyChanged;
-                    if (TransactionToMine.Completed)
-                        OnTransactionToMinePropertyChanged(TransactionToMine, new System.ComponentModel.PropertyChangedEventArgs(null));
+                    Action act = () =>
+                    {
+                        TransactionToMine.PropertyChanged += OnTransactionToMinePropertyChanged;
+                        _miningTransactionDialogViewModel = new SiftDialogViewModel
+                        {
+                            IsEthereumAnimatedLogoVisible = true,
+                            IsLogButtonVisible = true,
+                            Title = "Confirming SIFT Investment",
+                            Message = "Your transaction to invest in SIFT has been sent to the Ethereum network.  Depending on the current network congestion it may take anywhere between a few seconds and minutes for the transaction to confirm.  If the transaction does not confirm within a few minutes you can check your Ethereum wallet for more information." + Environment.NewLine + Environment.NewLine + "Please wait..."
+                        };
+                        _miningTransactionDialog = new SiftDialog
+                        {
+                            DataContext = _miningTransactionDialogViewModel,
+                            Owner = Application.Current.MainWindow
+                        };
+                        _miningTransactionDialogViewModel.CloseRequested += (s, e) => _miningTransactionDialog.Close();
+                        _miningTransactionDialog.ShowDialog();
+                        if (TransactionToMine.Completed)
+                            OnTransactionToMinePropertyChanged(TransactionToMine, new System.ComponentModel.PropertyChangedEventArgs(null));
+                    };
+                    if (Application.Current.Dispatcher.CheckAccess())
+                        act();
+                    else
+                        Application.Current.Dispatcher.Invoke(act);
                 }
             }
 
