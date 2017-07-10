@@ -239,6 +239,11 @@ namespace Lts.Sift.WinClient
         }
 
         /// <summary>
+        /// Gets whether or not the ICO has been abandoned.
+        /// </summary>
+        public bool IsIcoAbandoned => _ethereumManager.IsIcoAbandoned;
+
+        /// <summary>
         /// Gets the command to use to send an investment transaction to the blockchain.
         /// </summary>
         public ICommand SiftInvestCommand { get; private set; }
@@ -330,6 +335,8 @@ namespace Lts.Sift.WinClient
         {
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "TotalSiftIssued")
                 NotifyPropertyChanged("TotalSiftIssued");
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "IsIcoAbandoned")
+                NotifyPropertyChanged("IsIcoAbandoned");
         }
 
         /// <summary>
