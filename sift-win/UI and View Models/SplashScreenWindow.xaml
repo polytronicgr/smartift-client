@@ -38,11 +38,11 @@
             <local:EthereumAnimatedErrorLogo Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Top" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}" />
 
             <!-- Header text - goes red on error -->
-            <TextBlock Grid.Row="1" Grid.Column="1" FontSize="16" Foreground="#808080" FontFamily="BrandonText" FontWeight="Medium" Text="{Binding Path=StatusHeader,FallbackValue='Please Wait...'}" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToInverseVisibilityConverter}}" />
-            <TextBlock Grid.Row="1" Grid.Column="1" FontSize="16" Foreground="#D90702" FontFamily="BrandonText" FontWeight="Medium" Text="{Binding Path=StatusHeader,FallbackValue='Error...'}" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}" />
+            <TextBlock Grid.Row="1" Grid.Column="1" FontSize="16" Foreground="#808080" FontFamily="{StaticResource BrandonText}" FontWeight="Medium" Text="{Binding Path=StatusHeader,FallbackValue='Please Wait...'}" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToInverseVisibilityConverter}}" />
+            <TextBlock Grid.Row="1" Grid.Column="1" FontSize="16" Foreground="#D90702" FontFamily="{StaticResource BrandonText}" FontWeight="Medium" Text="{Binding Path=StatusHeader,FallbackValue='Error...'}" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}" />
 
             <!-- Main message text -->
-            <TextBlock Grid.Row="2" Grid.Column="1" FontSize="14" Foreground="#808080" FontFamily="BrandonText" Text="{Binding Path=StatusText,FallbackValue='Status text goes here on the splashscreen...'}" TextWrapping="Wrap" />
+            <TextBlock Grid.Row="2" Grid.Column="1" FontSize="14" Foreground="#808080" FontFamily="{StaticResource BrandonText}" Text="{Binding Path=StatusText,FallbackValue='Status text goes here on the splashscreen...'}" TextWrapping="Wrap" />
 
             <Button Grid.Row="4" Grid.Column="0" HorizontalAlignment="Left" Padding="0" Command="{Binding Path=LogViewCommand}" Background="Transparent" BorderThickness="0" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}">
                 <Button.Template>

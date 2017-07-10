@@ -1,14 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Lts.Sift.WinClient">
-    <FontFamily x:Key="BrandonGrotesqueBlack">pack://application:,,,/Fonts/#Brandon Grotesque Black</FontFamily>
-    <FontFamily x:Key="BrandonGrotesqueBold">pack://application:,,,/Fonts/#Brandon Grotesque Bold</FontFamily>
-    <FontFamily x:Key="BrandonGrotesqueLight">pack://application:,,,/Fonts/#Brandon Grotesque Light</FontFamily>
-    <FontFamily x:Key="BrandonGrotesqueMedium">pack://application:,,,/Fonts/#Brandon Grotesque Medium</FontFamily>
-    <FontFamily x:Key="BrandonGrotesque">pack://application:,,,/Fonts/#Brandon Grotesque Regular</FontFamily>
-    <FontFamily x:Key="BrandonGrotesqueThin">pack://application:,,,/Fonts/#Brandon Grotesque Thin</FontFamily>
+    <FontFamily x:Key="BrandonGrotesque">pack://application:,,,/Fonts/#Brandon Grotesque</FontFamily>
     <FontFamily x:Key="BrandonText">pack://application:,,,/Fonts/#BrandonText</FontFamily>
 
     <local:BoolToInverseVisibilityConverter x:Key="BoolToInverseVisibilityConverter" />
     <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    <local:NullToInverseVisibilityConverter x:Key="NullToInverseVisibilityConverter" />
+    <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
 </ResourceDictionary>

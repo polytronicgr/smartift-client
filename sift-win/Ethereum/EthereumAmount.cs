@@ -46,7 +46,7 @@ namespace Lts.Sift.WinClient
             if (ether >= 1)
             {
                 FriendlyAmount = Math.Round(ether, 2);
-                FriendlyUnit = "ether";
+                FriendlyUnit = "ETH";
             }
             else if (finney >= 1)
             {

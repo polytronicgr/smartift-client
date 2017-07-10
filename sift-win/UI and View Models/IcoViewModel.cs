@@ -150,9 +150,16 @@ namespace Lts.Sift.WinClient
                 if (_siftMaximumPurchase == value)
                     return;
                 _siftMaximumPurchase = value;
+                IsInvestmentBalanceSufficient = value > 1;
                 NotifyPropertyChanged();
+                NotifyPropertyChanged("IsInvestmentBalanceSufficient");
             }
         }
+
+        /// <summary>
+        /// Gets whether the balance in the investment account is enough to buy SIFT.
+        /// </summary>
+        public bool IsInvestmentBalanceSufficient { get; private set; }
 
         /// <summary>
         /// Gets or sets the amount of SIFT that the user would like to purchase.
@@ -304,12 +311,12 @@ namespace Lts.Sift.WinClient
             if (transaction.WasSuccessful)
             {
                 Logger.ApplicationInstance.Info("Purchase of SIFT added to block " + transaction.Receipt.BlockNumber.Value.ToString() + " for " + transaction.Receipt.TransactionHash + " at index " + transaction.Receipt.TransactionIndex.Value.ToString());
-                MessageBox.Show("Congratulations, your transaction for the purchase of SIFT has gone onto the Ethereum network.  Your new balance will be updated shortly and will be reflected in your Ethereum wallet.", "SIFT Investment", MessageBoxButton.OK, MessageBoxImage.Information);
+                SiftDialog.ShowDialog("SIFT Purchase Successful", "Congratulations!  Your transaction for the purchase of SIFT has gone onto the Ethereum network.  Your new balance will be updated shortly and will be reflected in your Ethereum wallet.");
             }
             else
             {
                 Logger.ApplicationInstance.Error("TransactionToMine failed with message.  " + transaction.ErrorDetails);
-                MessageBox.Show("There was a problem processing your transaction for SIFT.  " + transaction.ErrorDetails, "SIFT Purchase", MessageBoxButton.OK, MessageBoxImage.Error);
+                SiftDialog.ShowDialog("Problem Purchasing SIFT", "There was a problem processing your transaction for SIFT.  " + transaction.ErrorDetails, false, true);
             }
         }
 
@@ -374,12 +381,12 @@ namespace Lts.Sift.WinClient
             // Perform the purchase
             SiftPurchaseResponse response = await _ethereumManager.PurchaseSift(SelectedAccount.Address, SiftAmountToPurchase);
             if (!response.WasSuccessful)
-                MessageBox.Show("Sorry, there was a problem processing your transaction.  Your SIFT could not be purchased at this time." + Environment.NewLine + Environment.NewLine + response.FailureReason);
+                SiftDialog.ShowDialog("SIFT Investment Problem", "Sorry, there was a problem processing your transaction.  Your SIFT could not be purchased at this time." + Environment.NewLine + Environment.NewLine + response.FailureReason);
             else
             {
                 TransactionToMine = _ethereumManager.EnqueueTransactionPendingReceipt(response.TransactionHash);
                 if (TransactionToMine == null)
-                    MessageBox.Show("Your transaction sent with hash " + response.TransactionHash + ", but we could not mine it to confirm the transaction.  Your balance should update shortly, but if not please retry the transaction after checking your Ethereum wallet.");
+                    SiftDialog.ShowDialog("SIFT Delayed Investment", "Your transaction to buy SIFT was successfully sent with hash " + response.TransactionHash + ", but we could not validate the transaction.  Your balance should update shortly, but if not please retry the transaction after checking your Ethereum wallet.");
                 else
                 {
                     // Hookup to wait to hear the status, or process it immediately if we have it

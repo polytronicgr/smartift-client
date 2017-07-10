@@ -81,13 +81,21 @@ namespace Lts.Sift.WinClient
             {
                 // Intentionally swallowed
             }
+            string msg = "There was a fatal error within SIFT, please contact support with this message." + Environment.NewLine + ex;
             try
             {
-                MessageBox.Show("There was a fatal error within SIFT, please contact support with this message." + Environment.NewLine + ex);
+                SiftDialog.ShowDialog("Fatal Error", msg);
             }
             catch
             {
-                // Intentionally swallowed
+                try
+                {
+                    MessageBox.Show(msg);
+                }
+                catch
+                {
+                    // Intentionally swallowed
+                }
             }
         }
     }

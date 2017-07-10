@@ -88,6 +88,10 @@
     <Compile Include="UI and View Models\BaseAnimatedLogo.cs" />
     <Compile Include="UI and View Models\EthereumAnimatedErrorLogo.cs" />
     <Compile Include="UI and View Models\EthereumAnimatedLogo.cs" />
+    <Compile Include="UI and View Models\SiftDialog.xaml.cs">
+      <DependentUpon>SiftDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI and View Models\SiftDialogViewModel.cs" />
     <Compile Include="Wpf Support\BaseDragableWindow.cs" />
     <Compile Include="Wpf Support\BaseViewModel.cs" />
     <Compile Include="Commands\AwaitableDelegateCommand.cs" />
@@ -145,6 +149,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI and View Models\SiftDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI and View Models\SplashScreenWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -174,12 +182,12 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="ContractAbis\IcoPhaseManagement.abi" />
-    <Resource Include="Fonts\Brandon Grotesque Black.ttf" />
-    <Resource Include="Fonts\Brandon Grotesque Bold.ttf" />
-    <Resource Include="Fonts\Brandon Grotesque Light.ttf" />
-    <Resource Include="Fonts\Brandon Grotesque Medium.ttf" />
-    <Resource Include="Fonts\Brandon Grotesque Regular.ttf" />
-    <Resource Include="Fonts\Brandon Grotesque Thin.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque-Black.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque-Bold.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque-Light.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque-Medium.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque-Regular.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque-Thin.ttf" />
     <Resource Include="Fonts\BrandonText-Black.otf" />
     <Resource Include="Fonts\BrandonText-BlackItalic.otf" />
     <Resource Include="Fonts\BrandonText-Bold.otf" />
@@ -203,9 +211,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\log.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="sift.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -227,6 +232,35 @@
     <Resource Include="Images\sift-win-log-button-01.png" />
     <Resource Include="Images\sift-win-log-button-02.png" />
     <Resource Include="Images\sift-win-logo-main-window.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-dialog-logo-sift-01.png" />
+    <Resource Include="Images\sift-win-logo-eth-non-animated.png" />
+    <Resource Include="Images\sift-win-main-window-button-exit-01.png" />
+    <Resource Include="Images\sift-win-main-window-button-exit-02.png" />
+    <Resource Include="Images\sift-win-main-window-button-invest-01.png" />
+    <Resource Include="Images\sift-win-main-window-button-invest-02.png" />
+    <Resource Include="Images\sift-win-main-window-button-log-01.png" />
+    <Resource Include="Images\sift-win-main-window-button-log-02.png" />
+    <Resource Include="Images\sift-win-main-window-divider-line-left.png" />
+    <Resource Include="Images\sift-win-main-window-divider-line-right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-tag-line-more-information.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-slider-button-minus.png" />
+    <Resource Include="Images\sift-win-slider-button-plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-dialog-button-return-01.png" />
+    <Resource Include="Images\sift-win-dialog-button-return-02.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-dialog-button-yes-01.png" />
+    <Resource Include="Images\sift-win-dialog-button-yes-02.png" />
+    <Resource Include="Images\sift-win-dialog-no-button-red-01.png" />
+    <Resource Include="Images\sift-win-dialog-no-button-red-02.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

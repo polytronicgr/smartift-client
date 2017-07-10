@@ -9,110 +9,191 @@
         IsEnabled="{Binding Path=IsUiEnabled}" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignData Type=local:IcoViewModel}"
         Title="Smart Investment Fund Token (SIFT) ICO" SizeToContent="Height" 
-        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None" Width="720">
+        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None" Width="800">
     <Window.Resources>
-        <local:NullToInverseVisibilityConverter x:Key="NullToInverseVisibilityConverter" />
-        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <local:BoolToInverseVisibilityConverter x:Key="BoolToInverseVisibilityConverter" />
+        <ResourceDictionary Source="Resources.xaml" />
     </Window.Resources>
-
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <Border Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,0,0,10">
-            <Image Source="../Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" MaxWidth="720" />
-        </Border>
-
-        <!-- Account Selection -->
-        <Grid Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" Margin="0,0,0,10" Visibility="{Binding Path=IsAccountSelectionVisible,Converter={StaticResource BoolToVisibilityConverter}}">
+    <Window.Effect>
+        <DropShadowEffect Color="#000000" Direction="0" Opacity=".8" BlurRadius="30" ShadowDepth="0" RenderingBias="Quality" />
+    </Window.Effect>
+    <Border BorderBrush="#CCCCCC" BorderThickness="1">
+        <Grid Margin="20,20,20,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Account: " VerticalAlignment="Center" Margin="0,0,10,0" Foreground="Black" FontSize="24" />
-            <ComboBox Grid.Column="1" SelectedItem="{Binding Path=SelectedAccount}" ItemsSource="{Binding Path=Accounts}" VerticalAlignment="Center" Margin="10,0,0,0">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Path=Address}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </Grid>
 
-        <!-- Main Content Grid with Account Selected -->
-        <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}">
-            <!-- Balances  -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-                <TextBlock FontSize="32" Foreground="Black" Text="{Binding Path=SelectedAccount.Balance,FallbackValue='&#x221e;'}" HorizontalAlignment="Center" Margin="10,0,10,0" VerticalAlignment="Center" />
-                <TextBlock FontSize="32" Foreground="Black" Text="{Binding Path=SelectedAccount.BalanceUnit,FallbackValue='ether'}" HorizontalAlignment="Center" Margin="10,0,30,0" VerticalAlignment="Center" />
-                <TextBlock FontSize="32" Foreground="Black" Text="{Binding Path=SelectedAccount.SiftBalance,FallbackValue='&#x221e;', StringFormat={}{0:N0}}" HorizontalAlignment="Center" Margin="30,0,10,0" VerticalAlignment="Center" />
-                <TextBlock FontSize="32" Foreground="Black" Text="SIFT" HorizontalAlignment="Center" Margin="0,0,10,0" VerticalAlignment="Center" />
+            <Image Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" Margin="0,0,0,35" Source="../Images/sift-win-logo-main-window.png" Stretch="None"  />
+
+            <!-- Account Balance -->
+            <StackPanel Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Center">
+                <!-- Account Balance Header -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,25" HorizontalAlignment="Center">
+                    <Image Source="../Images/sift-win-main-window-divider-line-left.png" Stretch="None" />
+                    <TextBlock Text="YOUR ACCOUNT BALANCE" FontFamily="{StaticResource BrandonGrotesque}" Foreground="#BDC3C7" FontSize="16" Margin="12,0,12,0" />
+                    <Image Source="../Images/sift-win-main-window-divider-line-right.png" Stretch="None" />
+                </StackPanel>
+
+                <!-- Account Selection -->
+                <Grid HorizontalAlignment="Center" Visibility="{Binding Path=IsAccountSelectionVisible,Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Account: " VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" FontSize="14.7" />
+                    <ComboBox Grid.Column="1" SelectedItem="{Binding Path=SelectedAccount}" ItemsSource="{Binding Path=Accounts}" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Address}" FontFamily="{StaticResource BrandonGrotesque}" Foreground="#808080" FontSize="14.7" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
+
+                <!-- Balances  -->
+                <TextBlock FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" Text="Please select an account above to view your balance and invest in SIFT." Margin="0,15,0,0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToInverseVisibilityConverter}}" />
+                <Grid HorizontalAlignment="Stretch" Margin="55,0,55,0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0" Source="../Images/sift-win-logo-eth-non-animated.png" Stretch="None" />
+                    <TextBlock Grid.Column="1" Text="{Binding Path=SelectedAccount.Balance,FallbackValue='0.00'}" FontFamily="{StaticResource BrandonGrotesque}" FontSize="26.7" VerticalAlignment="Center" Margin="15,0,0,0" />
+                    <TextBlock Grid.Column="2" Text="{Binding Path=SelectedAccount.BalanceUnit,FallbackValue='ETH'}" FontFamily="{StaticResource BrandonGrotesque}" FontSize="26.7" Foreground="#626262" VerticalAlignment="Center" Margin="11,0,0,0" />
+
+                    <TextBlock Grid.Column="4" Text="{Binding Path=SelectedAccount.SiftBalance,FallbackValue='0', StringFormat={}{0:N0}}" FontFamily="{StaticResource BrandonGrotesque}" FontSize="26.7" VerticalAlignment="Center" Margin="0,0,11,0" />
+                    <TextBlock Grid.Column="5" Text="{Binding Path=SelectedAccount.BalanceUnit,FallbackValue='SIFT'}" FontFamily="{StaticResource BrandonGrotesque}" FontSize="26.7" Foreground="#626262" VerticalAlignment="Center" Margin="0,0,15,0" />
+                    <Image Grid.Column="6" Source="../Images/sift-win-dialog-logo-sift-01.png" Stretch="None" />
+                </Grid>
             </StackPanel>
 
-            <TextBlock FontSize="14" Foreground="Black" HorizontalAlignment="Center" Margin="0,0,0,10" VerticalAlignment="Center">
-                <Run Text="You are a" />
-                <Run Text="{Binding Path=SelectedAccount.DisplayShareholdingPercentage,FallbackValue='0%',Mode=OneWay}" />
-                <Run Text="shareholder in SIFT." />
-            </TextBlock>
+            <!-- Invest in SIFT -->
+            <StackPanel Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Center" Margin="0,35,0,0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}">
+                <!-- Header -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,25" HorizontalAlignment="Center">
+                    <Image Source="../Images/sift-win-main-window-divider-line-left.png" Stretch="None" />
+                    <TextBlock Text="INVEST IN SIFT" FontFamily="{StaticResource BrandonGrotesque}" Foreground="#BDC3C7" FontSize="16" Margin="12,0,12,0" />
+                    <Image Source="../Images/sift-win-main-window-divider-line-right.png" Stretch="None" />
+                </StackPanel>
 
-            <!-- Confirmation In Progress -->
-            <TextBlock FontSize="32" Foreground="Black" Text="Please wait whilst your purchase of SIFT is confirmed on the network, this may take a few minutes..." TextWrapping="Wrap" TextAlignment="Center" Visibility="{Binding Path=TransactionToMine, Converter={StaticResource NullToVisibilityConverter}}" />
+                <!-- No Funds -->
+                <TextBlock FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" Text="To invest in SIFT you need at least 0.01 ETH plus the transaction fee.  As soon as you fund your account this screen will update and you will be able to invest." TextWrapping="Wrap" Visibility="{Binding Path=IsInvestmentBalanceSufficient, Converter={StaticResource BoolToInverseVisibilityConverter}, FallbackValue=Collapsed}" />
 
-            <!-- No Confirmation In Progress - Either Buy or No Balance -->
-            <Grid Visibility="{Binding Path=TransactionToMine, Converter={StaticResource NullToInverseVisibilityConverter}}">
-                <!-- Buy -->
-                <StackPanel Orientation="Vertical" Visibility="{Binding Path=SiftPurchaseIsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBlock Grid.ColumnSpan="4" TextWrapping="Wrap" Foreground="Black" FontSize="16">
-                    <Run Text="You can invest in SIFT using the slider below - just slide it right to show how many SIFT you want to buy then press the buy button.  There are currently" />
-                    <Run Text="{Binding Path=TotalSiftIssued, Mode=OneWay, FallbackValue=0, StringFormat={}{0:N0}}" />
-                    <Run Text="SIFT issued in total." />
-                    </TextBlock>
-                    <Grid Margin="0,10,0,0">
+                <!-- Investment Area with Slider -->
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <TextBlock FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" Text="Select the amount of SIFT you wish to purchase using the slider below.  The cost in ETH is displayed on the left and the amount of SIFT you are buying is shown on the right.  When you're ready to invest press the Invest button below." TextWrapping="Wrap" />
+                    <Grid Margin="0,45,0,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" MinWidth="70" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="100" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition MinWidth="60" Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="100" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Path=SiftCostToPurchase, StringFormat={}{0:0.00} ether, FallbackValue='0.00 eth'}" FontSize="16" Foreground="Black" VerticalAlignment="Center" />
-                        <Slider Grid.Column="1" Minimum="0" Maximum="{Binding Path=SiftMaximumPurchase, FallbackValue=100}" Value="{Binding Path=SiftAmountToPurchase}" Margin="10,0,10,0" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" Text="{Binding Path=SiftAmountToPurchase, StringFormat={}{0:N0} SIFT, FallbackValue='0 SIFT'}" FontSize="16" Foreground="Black" VerticalAlignment="Center" />
-                        <StackPanel Orientation="Vertical" Grid.Column="3" Margin="10,0,0,0">
-                            <Button Content="+" Command="{Binding Path=SiftIncreaseQuantityCommand}" IsEnabled="{Binding Path=SiftIncreaseQuantityIsEnabled}" Width="20" Height="20" />
-                            <Button Content="-" Command="{Binding Path=SiftDecreaseQuantityCommand}" IsEnabled="{Binding Path=SiftDecreaseQuantityIsEnabled}" Width="20" Height="20" />
+                        <TextBlock Grid.Column="0" Text="ETH" FontFamily="{StaticResource BrandonGrotesque}" FontSize="26.7" Foreground="#2293FF " VerticalAlignment="Center" Margin="0,0,11,0" />
+                        <TextBlock Grid.Column="1" Text="{Binding Path=SiftCostToPurchase,FallbackValue='0.00'}" FontFamily="{StaticResource BrandonGrotesque}" FontSize="26.7" VerticalAlignment="Center" />
+
+                        <Slider Grid.Column="2" Minimum="0" Maximum="{Binding Path=SiftMaximumPurchase, FallbackValue=100}" Value="{Binding Path=SiftAmountToPurchase}" Margin="0,0,25,0" VerticalAlignment="Center" />
+
+                        <StackPanel Grid.Column="3" Orientation="Vertical">
+                            <Button Command="{Binding Path=SiftIncreaseQuantityCommand}" IsEnabled="{Binding Path=SiftIncreaseQuantityIsEnabled}" Width="17" Height="17">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Image Name="image" Source="../Images/sift-win-slider-button-plus.png"  Stretch="Uniform" StretchDirection="DownOnly" />
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter TargetName="image" Property="Source" Value="../Images/sift-win-slider-button-plus.png" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <Button Command="{Binding Path=SiftDecreaseQuantityCommand}" IsEnabled="{Binding Path=SiftDecreaseQuantityIsEnabled}" Width="17" Height="17">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Image Name="image" Source="../Images/sift-win-slider-button-minus.png" Stretch="Uniform" StretchDirection="DownOnly" />
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="true">
+                                                <Setter TargetName="image" Property="Source" Value="../Images/sift-win-slider-button-minus.png" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
                         </StackPanel>
-                        <Button Grid.Column="4" Content="Invest" IsEnabled="{Binding Path=SiftInvestIsEnabled}" Command="{Binding Path=SiftInvestCommand}" Margin="10,0,0,0" Padding="20,10,20,10" />
+
+                        <TextBlock Grid.Column="4" Text="{Binding Path=SiftAmountToPurchase,FallbackValue='0.00'}" FontFamily="{StaticResource BrandonGrotesque}" FontSize="26.7" VerticalAlignment="Center" Margin="0,0,11,0" HorizontalAlignment="Right" />
+                        <TextBlock Grid.Column="5" Text="SIFT" FontFamily="{StaticResource BrandonGrotesque}" FontSize="26.7" Foreground="#2293FF " VerticalAlignment="Center" />
+
+                        <Button Grid.Column="6" Padding="0" IsEnabled="{Binding Path=SiftInvestIsEnabled}" Command="{Binding Path=SiftInvestCommand}" Margin="35,0,0,0" VerticalAlignment="Center">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Image Name="image" Source="../Images/sift-win-main-window-button-invest-01.png" Stretch="None" />
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter TargetName="image" Property="Source" Value="../Images/sift-win-main-window-button-invest-02.png" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
                     </Grid>
                 </StackPanel>
 
-                <!-- Not Enough Ether -->
-                <TextBlock Foreground="Black" FontSize="16" TextWrapping="Wrap"  Visibility="{Binding Path=SiftPurchaseIsVisible, Converter={StaticResource BoolToInverseVisibilityConverter}}">
-                <Run Text="You don't have enough ether to buy any SIFT.  Each share in SIFT costs 0.01 ether.  Once you fund your account options to invest in SIFT will appear here.  There are currently" />
-                <Run Text="{Binding Path=TotalSiftIssued, Mode=OneWay, FallbackValue=0}" />
-                <Run Text="SIFT issued in total." />
-                </TextBlock>
+                <!-- Current Holdings -->
+            </StackPanel>
+
+            <!-- Footer -->
+            <Grid Grid.Row="3" HorizontalAlignment="Stretch" Margin="0,25,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Padding="0" Command="{Binding Path=LogViewCommand}" Background="Transparent" BorderThickness="0">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Name="image" Source="../Images/sift-win-main-window-button-log-01.png" Stretch="None" />
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter TargetName="image" Property="Source" Value="../Images/sift-win-main-window-button-log-02.png" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Padding="0" Command="{Binding Path=ExitCommand}" VerticalAlignment="Bottom">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Name="image" Source="../Images/sift-win-main-window-button-exit-01.png" Stretch="None" />
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter TargetName="image" Property="Source" Value="../Images/sift-win-main-window-button-exit-02.png" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Source="../Images/sift-win-tag-line-more-information.png" Stretch="None" HorizontalAlignment="Center" Margin="0,15,0,0" MouseLeftButtonDown="OnLogoClick" />
             </Grid>
-        </StackPanel>
-
-        <!-- "Please Select An Account" with No Account -->
-        <Grid Grid.Row="2" Grid.Column="0" Visibility="{Binding Path=SelectedAccount, Converter={StaticResource NullToInverseVisibilityConverter}, FallbackValue='Collapsed'}">
-            <TextBlock FontSize="32" Foreground="Black" Text="Please select an account" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
         </Grid>
-
-        <!-- Buttons -->
-        <Button Grid.Row="3" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="0,10,0,0" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" />
-        <Button Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left" Margin="0,10,0,0" Padding="0" Command="{Binding Path=LogViewCommand}" Background="Transparent" BorderThickness="0">
-            <Image Source="../Images/log.png" Width="32" Stretch="UniformToFill" StretchDirection="DownOnly" />
-        </Button>
-    </Grid>
+    </Border>
 </local:BaseDragableWindow>
