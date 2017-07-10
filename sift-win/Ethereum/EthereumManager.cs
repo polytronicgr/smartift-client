@@ -596,6 +596,7 @@ namespace Lts.Sift.WinClient
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.UserCancelled, "User cancelled transaction on confirmation screen.");
 
                 // Unlock the account
+                SiftDialog dialog = SiftDialog.ShowButtonless("Sending Transaction", "Please wait whilst the transaction to buy SIFT is sent to the Ethereum network, this should only take a few seconds...", true);
                 Logger.ApplicationInstance.Debug("Attempting to unlock " + address);
                 if (!await _web3.Personal.UnlockAccount.SendRequestAsync(address, viewModel.Password == null ? string.Empty : viewModel.Password.ToString(), 120))
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.UnlockError, "Unable to unlock account with the supplied password.");
@@ -610,8 +611,13 @@ namespace Lts.Sift.WinClient
                     GasPrice = new HexBigInteger(new BigInteger(viewModel.SelectedGasMultiplier * gasCost)),
                     Gas = new HexBigInteger(new BigInteger(viewModel.Gas))
                 };
-                Logger.ApplicationInstance.Info("Send transaction for " + purchaseCostWei + " to " + IcoContractAddress + " from " + address);
+                Logger.ApplicationInstance.Info("Sending transaction for " + purchaseCostWei + " to " + IcoContractAddress + " from " + address);
                 string transactionHash = await _web3.Eth.Transactions.SendTransaction.SendRequestAsync(transactionInput);
+                Action act = dialog.Close;
+                if (dialog.Dispatcher.CheckAccess())
+                    act();
+                else
+                    dialog.Dispatcher.Invoke(act);
 
                 // Return the response of the transaction hash
                 return new SiftPurchaseResponse(transactionHash);

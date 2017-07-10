@@ -66,5 +66,50 @@ namespace Lts.Sift.WinClient
             else
                 return Application.Current.Dispatcher.Invoke(uiCallback);
         }
+
+        /// <summary>
+        /// Shows a SIFT dialog without any buttons in non-modal mode.
+        /// </summary>
+        /// <param name="title">
+        /// The title of the message.
+        /// </param>
+        /// <param name="message">
+        /// The message to show.
+        /// </param>
+        /// <param name="isEthereum">
+        /// If this dialog is related to the ethereum network (true) and as such the ethereum logo should be displayed, otherwise false.
+        /// </param>
+        /// <returns>
+        /// The dialog that was shown.
+        /// </returns>
+        public static SiftDialog ShowButtonless(string title, string message, bool isEthereum = false)
+        {
+            Func<SiftDialog> uiCallback = () =>
+            {
+                SiftDialogViewModel viewModel = new SiftDialogViewModel
+                {
+                    Title = title,
+                    Message = message,
+                    IsEthereumAnimatedLogoVisible = isEthereum,
+                    IsSiftLogoVisible = !isEthereum,
+                    IsLogButtonVisible = true,
+                    IsNoButtonVisible = false,
+                    IsReturnButtonVisible = false,
+                    IsYesButtonVisible = false
+                };
+                SiftDialog dialog = new SiftDialog
+                {
+                    DataContext = viewModel,
+                    Owner = Application.Current.MainWindow
+                };
+                viewModel.CloseRequested += (s, e) => dialog.Close();
+                dialog.Show();
+                return dialog;
+            };
+            if (Application.Current.Dispatcher.CheckAccess())
+                return uiCallback();
+            else
+                return Application.Current.Dispatcher.Invoke(uiCallback);
+        }
     }
 }

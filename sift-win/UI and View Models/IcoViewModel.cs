@@ -314,11 +314,9 @@ namespace Lts.Sift.WinClient
             if (!transaction.Completed)
                 return;
 
-            // Clear out the transaction to mine and our dialog
+            // Clear out the transaction to mine
             TransactionToMine = null;
             SiftDialogViewModel viewModel = _miningTransactionDialogViewModel;
-            _miningTransactionDialogViewModel = null;
-            _miningTransactionDialog = null;
 
             // Display a message accordingly
             viewModel.IsReturnButtonVisible = true;
@@ -423,10 +421,13 @@ namespace Lts.Sift.WinClient
                             DataContext = _miningTransactionDialogViewModel,
                             Owner = Application.Current.MainWindow
                         };
-                        _miningTransactionDialogViewModel.CloseRequested += (s, e) => _miningTransactionDialog.Close();
+                        _miningTransactionDialogViewModel.CloseRequested += (s, e) =>
+                        {
+                            _miningTransactionDialog.Close();
+                            _miningTransactionDialog = null;
+                            _miningTransactionDialogViewModel = null;
+                        };
                         _miningTransactionDialog.ShowDialog();
-                        if (TransactionToMine.Completed)
-                            OnTransactionToMinePropertyChanged(TransactionToMine, new System.ComponentModel.PropertyChangedEventArgs(null));
                     };
                     if (Application.Current.Dispatcher.CheckAccess())
                         act();
