@@ -15,7 +15,7 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines the message to show when we are connecting to ethereum.
         /// </summary>
-        private const string MessageConnecting = "Please wait whilst we connect to the Ethereum network...";
+        private const string MessageConnecting = "We are attempting to connect to the Ethereum Network.\r\nThis may take a few seconds...";
 
         /// <summary>
         /// Defines the message to show when it's not possible to connect to ethereum's RPC interface.
@@ -48,6 +48,11 @@ namespace Lts.Sift.WinClient
         private string _statusText;
 
         /// <summary>
+        /// Defines the header we display on the splash screen.
+        /// </summary>
+        private string _statusHeader;
+
+        /// <summary>
         /// Defines whether or not the splash screen thread should be running.
         /// </summary>
         private bool _isAlive;
@@ -55,10 +60,25 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines whether the exit button is visible.
         /// </summary>
-        private bool _isExitButtonVisible;
+        private bool _isErrorState;
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Gets the header we display on the splash screen.
+        /// </summary>
+        public string StatusHeader
+        {
+            get { return _statusHeader; }
+            private set
+            {
+                if (_statusHeader == value)
+                    return;
+                _statusHeader = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         /// <summary>
         /// Gets the text we display on the splash screen.
         /// </summary>
@@ -75,16 +95,16 @@ namespace Lts.Sift.WinClient
         }
 
         /// <summary>
-        /// Gets whether the exit button is visible.
+        /// Gets whether the window is showing an error state is visible.
         /// </summary>
-        public bool IsExitButtonVisible
+        public bool IsErrorState
         {
-            get { return _isExitButtonVisible; }
+            get { return _isErrorState; }
             set
             {
-                if (_isExitButtonVisible == value)
+                if (_isErrorState == value)
                     return;
-                _isExitButtonVisible = value;
+                _isErrorState = value;
                 NotifyPropertyChanged();
             }
         }
@@ -117,6 +137,7 @@ namespace Lts.Sift.WinClient
         {
             // Always check for updates first
             StatusText = "Checking for updates to sift-win...";
+            StatusHeader = "Please Wait...";
             try
             {
                 // Login to update API
@@ -166,6 +187,7 @@ namespace Lts.Sift.WinClient
                 // If we've just gone over 5 seconds display a "this may be broken" message and enable exit button
                 if (DateTime.UtcNow > started.AddSeconds(5) || _ethereumManager.LastChecksSuccessful)
                 {
+                    StatusHeader = "Error!";
                     if (!_ethereumManager.LastChecksSuccessful || _ethereumManager.BlockNumber < 1)
                         StatusText = MessageDelayedStart;
                     else if (_ethereumManager.Accounts.Count < 1)
@@ -174,7 +196,7 @@ namespace Lts.Sift.WinClient
                         StatusText = MessageSyncing;
                     else
                         StatusText = MessageUnknownContractState;
-                    IsExitButtonVisible = true;
+                    IsErrorState = true;
                 }
 
                 // Wait to retry

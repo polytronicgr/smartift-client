@@ -85,6 +85,9 @@
     <Compile Include="Api Client\ApiClient.cs" />
     <Compile Include="Api Client\AuthenticationClient.cs" />
     <Compile Include="Api Client\ProductClient.cs" />
+    <Compile Include="UI and View Models\BaseAnimatedLogo.cs" />
+    <Compile Include="UI and View Models\EthereumAnimatedErrorLogo.cs" />
+    <Compile Include="UI and View Models\EthereumAnimatedLogo.cs" />
     <Compile Include="Wpf Support\BaseDragableWindow.cs" />
     <Compile Include="Wpf Support\BaseViewModel.cs" />
     <Compile Include="Commands\AwaitableDelegateCommand.cs" />
@@ -118,6 +121,10 @@
     <Compile Include="UI and View Models\TransactionUnlockWindow.xaml.cs">
       <DependentUpon>TransactionUnlockWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI and View Models\Resources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI and View Models\IcoWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -167,6 +174,24 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="ContractAbis\IcoPhaseManagement.abi" />
+    <Resource Include="Fonts\Brandon Grotesque Black.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque Bold.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque Light.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque Medium.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque Regular.ttf" />
+    <Resource Include="Fonts\Brandon Grotesque Thin.ttf" />
+    <Resource Include="Fonts\BrandonText-Black.otf" />
+    <Resource Include="Fonts\BrandonText-BlackItalic.otf" />
+    <Resource Include="Fonts\BrandonText-Bold.otf" />
+    <Resource Include="Fonts\BrandonText-BoldItalic.otf" />
+    <Resource Include="Fonts\BrandonText-Light.otf" />
+    <Resource Include="Fonts\BrandonText-LightItalic.otf" />
+    <Resource Include="Fonts\BrandonText-Medium.otf" />
+    <Resource Include="Fonts\BrandonText-MediumItalic.otf" />
+    <Resource Include="Fonts\BrandonText-Regular.otf" />
+    <Resource Include="Fonts\BrandonText-RegularItalic.otf" />
+    <Resource Include="Fonts\BrandonText-Thin.otf" />
+    <Resource Include="Fonts\BrandonText-ThinItalic.otf" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -178,13 +203,30 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\header.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\log.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="sift.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-logo-dialog-box.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-logo-eth-animation-01.png" />
+    <Resource Include="Images\sift-win-logo-eth-animation-02.png" />
+    <Resource Include="Images\sift-win-logo-eth-animation-03.png" />
+    <Resource Include="Images\sift-win-logo-eth-animation-04.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-logo-eth-animation-error-01.png" />
+    <Resource Include="Images\sift-win-logo-eth-animation-error-02.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-dialog-exit-button-red-01.png" />
+    <Resource Include="Images\sift-win-dialog-exit-button-red-02.png" />
+    <Resource Include="Images\sift-win-log-button-01.png" />
+    <Resource Include="Images\sift-win-log-button-02.png" />
+    <Resource Include="Images\sift-win-logo-main-window.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -9,29 +9,65 @@
         IsEnabled="{Binding Path=IsUiEnabled}"
         d:DataContext="{d:DesignData Type=local:SplashScreenViewModel}"
         Title="Smart Investment Fund Token (SIFT)" WindowStartupLocation="CenterScreen"
-        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None" Width="420" Height="200">
+        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None" Width="550" Height="225">
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <ResourceDictionary Source="Resources.xaml" />
     </Window.Resources>
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+    <Window.Effect>
+        <DropShadowEffect Color="#000000" Direction="0" Opacity=".8" BlurRadius="30" ShadowDepth="0" RenderingBias="Quality" />
+    </Window.Effect>
 
-        <Border Grid.Row="0"  HorizontalAlignment="Stretch" Margin="0,0,0,10">
-            <Image Source="../Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" Width="400" />
-        </Border>
+    <Border BorderBrush="#CCCCCC" BorderThickness="1">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="1" FontSize="16" Foreground="Black" Text="{Binding Path=StatusText,FallbackValue='Status text goes here on the splashscreen...'}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+            <Image Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="0,0,0,35" Source="../Images/sift-win-logo-dialog-box.png" StretchDirection="DownOnly" Stretch="UniformToFill"  />
 
-        <Button Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" Margin="0,10,0,0" Padding="0" Command="{Binding Path=LogViewCommand}" Background="Transparent" BorderThickness="0" Visibility="{Binding Path=IsExitButtonVisible, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}">
-            <Image Source="../Images/log.png" Width="32" Stretch="UniformToFill" StretchDirection="DownOnly" />
-        </Button>
-        <Button Grid.Row="2" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="10" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" Visibility="{Binding Path=IsExitButtonVisible, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}" VerticalAlignment="Bottom" />
-    </Grid>
+            <!-- Ethereum Logo - either pulsing or red -->
+            <local:EthereumAnimatedLogo Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Top" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToInverseVisibilityConverter}, FallbackValue=Collapsed}" />
+            <local:EthereumAnimatedErrorLogo Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Top" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}" />
+
+            <!-- Header text - goes red on error -->
+            <TextBlock Grid.Row="1" Grid.Column="1" FontSize="16" Foreground="#808080" FontFamily="BrandonText" FontWeight="Medium" Text="{Binding Path=StatusHeader,FallbackValue='Please Wait...'}" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToInverseVisibilityConverter}}" />
+            <TextBlock Grid.Row="1" Grid.Column="1" FontSize="16" Foreground="#D90702" FontFamily="BrandonText" FontWeight="Medium" Text="{Binding Path=StatusHeader,FallbackValue='Error...'}" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}" />
+
+            <!-- Main message text -->
+            <TextBlock Grid.Row="2" Grid.Column="1" FontSize="14" Foreground="#808080" FontFamily="BrandonText" Text="{Binding Path=StatusText,FallbackValue='Status text goes here on the splashscreen...'}" TextWrapping="Wrap" />
+
+            <Button Grid.Row="4" Grid.Column="0" HorizontalAlignment="Left" Padding="0" Command="{Binding Path=LogViewCommand}" Background="Transparent" BorderThickness="0" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Image Name="image" Source="../Images/sift-win-log-button-01.png" Stretch="None" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="image" Property="Source" Value="../Images/sift-win-log-button-02.png" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <Button Grid.Row="4" Grid.Column="1" Content="Exit" HorizontalAlignment="Right" Margin="0" Padding="0" Command="{Binding Path=ExitCommand}" Visibility="{Binding Path=IsErrorState, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}" VerticalAlignment="Bottom">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Image Name="image" Source="../Images/sift-win-dialog-exit-button-red-01.png" Stretch="None" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="image" Property="Source" Value="../Images/sift-win-dialog-exit-button-red-02.png" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </Grid>
+    </Border>
 </local:BaseDragableWindow>
