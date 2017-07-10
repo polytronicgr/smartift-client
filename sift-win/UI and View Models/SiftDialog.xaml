@@ -58,7 +58,7 @@
                 <Button Margin="25,0,0,0" Padding="0" Command="{Binding Path=YesCommand}" Visibility="{Binding Path=IsYesButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" VerticalAlignment="Bottom">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Image Name="image" Source="../Images/sift-win-dialog-button-yes-01.png" Stretch="None" />
+                            <Image Name="image" Source="../Images/sift-win-dialog-button-yes-01.png" Stretch="Uniform" Width="81" Height="30"/>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="true">
                                     <Setter TargetName="image" Property="Source" Value="../Images/sift-win-dialog-button-yes-02.png" />
@@ -71,10 +71,10 @@
                 <Button Margin="25,0,0,0" Padding="0" Command="{Binding Path=NoCommand}" Visibility="{Binding Path=IsNoButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" VerticalAlignment="Bottom">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Image Name="image" Source="../Images/sift-win-dialog-no-button-red-01.png" Stretch="None" />
+                            <Image Name="image" Source="../Images/sift-win-dialog-button-no-01.png" Stretch="Uniform" Width="81" Height="30"/>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter TargetName="image" Property="Source" Value="../Images/sift-win-dialog-no-button-red-02.png" />
+                                    <Setter TargetName="image" Property="Source" Value="../Images/sift-win-dialog-button-no-02.png" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

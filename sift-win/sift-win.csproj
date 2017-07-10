@@ -259,8 +259,10 @@
   <ItemGroup>
     <Resource Include="Images\sift-win-dialog-button-yes-01.png" />
     <Resource Include="Images\sift-win-dialog-button-yes-02.png" />
-    <Resource Include="Images\sift-win-dialog-no-button-red-01.png" />
-    <Resource Include="Images\sift-win-dialog-no-button-red-02.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-dialog-button-no-01.png" />
+    <Resource Include="Images\sift-win-dialog-button-no-02.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
