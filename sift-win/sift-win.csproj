@@ -166,12 +166,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="ContractAbis\IcoPhaseManagement.abi" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <EmbeddedResource Include="Sift.abi" />
+    <EmbeddedResource Include="ContractAbis\SmartInvestmentFundToken.abi" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

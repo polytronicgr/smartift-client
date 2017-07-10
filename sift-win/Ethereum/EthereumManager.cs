@@ -25,12 +25,22 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines the address of SIFT's contract.
         /// </summary>
-        public const string ContractAddress = "0xAeE66f6DDbFD69D40A0C0e524f18fb273FF6Aac9";
+        public const string SiftContractAddress = "0x8A12268B60065CA9ea29EF0f80F14e3F1cD0313d";
 
         /// <summary>
-        /// Defines the version of the contract we are expecting.
+        /// Defines the version of the SIFT contract we are expecting.
         /// </summary>
-        public const string ContractVersion = "SIFT 201707051557";
+        public const decimal SiftContractVersion = 500201707071147m;
+
+        /// <summary>
+        /// Defines the address of the ICO's contract.
+        /// </summary>
+        public const string IcoContractAddress = "0xf7D42837C6173ce38a4B2bb63AE70860f4a47982";
+
+        /// <summary>
+        /// Defines the version of the ICO contract we are expecting.
+        /// </summary>
+        public const decimal IcoContractVersion = 300201707071208m;
 
         /// <summary>
         /// Defines whether or not the thread is alive that checks in the background.
@@ -58,6 +68,11 @@ namespace Lts.Sift.WinClient
         private ContractPhase _contractPhase;
 
         /// <summary>
+        /// Defines whether or not the ICO has been abandoned.
+        /// </summary>
+        private bool _isIcoAbandoned;
+
+        /// <summary>
         /// Defines the current block number.
         /// </summary>
         private ulong _blockNumber;
@@ -80,7 +95,12 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines the smart contract to use for communicating with SIFT.
         /// </summary>
-        private readonly Contract _contract;
+        private readonly Contract _siftContract;
+
+        /// <summary>
+        /// Defines the smart contract to use for communicating with the ICO.
+        /// </summary>
+        private readonly Contract _icoContract;
 
         /// <summary>
         /// Defines the interface to the ERC20 part of the SIFT contract
@@ -120,6 +140,21 @@ namespace Lts.Sift.WinClient
                 if (_contractPhase == value)
                     return;
                 _contractPhase = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets whether or not the ICO has been abandoned.
+        /// </summary>
+        public bool IsIcoAbandoned
+        {
+            get { return _isIcoAbandoned; }
+            private set
+            {
+                if (_isIcoAbandoned == value)
+                    return;
+                _isIcoAbandoned = value;
                 NotifyPropertyChanged();
             }
         }
@@ -218,20 +253,10 @@ namespace Lts.Sift.WinClient
             _web3 = new Web3(url);
             Accounts = new ObservableCollection<EthereumAccount>();
 
-            // Read in our contract ABI
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            string resourceName = "Lts.Sift.WinClient.Sift.abi";
-            string abi;
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-                abi = reader.ReadToEnd();
-            if (string.IsNullOrEmpty(abi))
-                throw new Exception("Error reading contract ABI");
-            Logger.ApplicationInstance.Debug("ABI loaded successfully for contract at " + ContractAddress);
-
-            // Store a handle to our contract
-            _contract = _web3.Eth.GetContract(abi, ContractAddress);
-            _tokenService = new StandardTokenService(_web3, _contract.Address);
+            // Store a handle to our contracts
+            _icoContract = _web3.Eth.GetContract(GetAbi("IcoPhaseManagement"), IcoContractAddress);
+            _siftContract = _web3.Eth.GetContract(GetAbi("SmartInvestmentFundToken"), SiftContractAddress);
+            _tokenService = new StandardTokenService(_web3, _siftContract.Address);
 
             // Start our thread
             _isAlive = true;
@@ -304,22 +329,38 @@ namespace Lts.Sift.WinClient
                     // Ask the contract our status but first check we've got the right contract
                     if (DateTime.UtcNow >= nextContractCheckTime)
                     {
-                        Logger.ApplicationInstance.Debug("Checking contract version");
-                        string contractVersion = _contract.GetFunction("siftContractVersion").CallAsync<string>().Result;
-                        if (contractVersion == ContractVersion)
+                        // First check the ICO contract
+                        Logger.ApplicationInstance.Debug("Checking ICO contract version");
+                        decimal icoContractVersion = decimal.Parse(_icoContract.GetFunction("contractVersion").CallAsync<ulong>().Result.ToString());
+                        if (icoContractVersion == IcoContractVersion)
                         {
-                            bool isIcoPhase = _contract.GetFunction("icoPhase").CallAsync<bool>().Result;
+                            // Get the phase of the ICO
+                            bool isIcoPhase = _icoContract.GetFunction("icoPhase").CallAsync<bool>().Result;
                             ContractPhase = isIcoPhase ? ContractPhase.Ico : ContractPhase.Trading;
 
+                            // Check if the ICO is abandoned
+                            IsIcoAbandoned = _icoContract.GetFunction("icoAbandoned").CallAsync<bool>().Result;
+
                             // Whilst we're here we also want to check the gas cost to send
-                            DefaultGasInfo = CalculateGasCostForEtherSend("0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", ContractAddress, 1000000000000000000m).Result;
+                            DefaultGasInfo = CalculateGasCostForEtherSend("0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", IcoContractAddress, 1000000000000000000m).Result;
                             Logger.ApplicationInstance.Error("Default gas calculating for sending as " + DefaultGasInfo.Gas + " at " + DefaultGasInfo.GasPrice + " = " + DefaultGasInfo.GasCost);
                         }
                         else
                         {
                             ContractPhase = ContractPhase.Unknown;
-                            Logger.ApplicationInstance.Error("Contract mismatch - expected " + ContractVersion + " but got " + contractVersion + " at " + ContractAddress);
+                            Logger.ApplicationInstance.Error("ICO contract mismatch - expected " + IcoContractVersion + " but got " + icoContractVersion + " at " + IcoContractAddress);
                         }
+
+                        // Now check SIFT contract
+                        Logger.ApplicationInstance.Debug("Checking SIFT contract version");
+                        decimal siftContractVersion = decimal.Parse(_siftContract.GetFunction("contractVersion").CallAsync<ulong>().Result.ToString());
+                        if (siftContractVersion != SiftContractVersion)
+                        {
+                            ContractPhase = ContractPhase.Unknown;
+                            Logger.ApplicationInstance.Error("SIFT contract mismatch - expected " + SiftContractVersion + " but got " + siftContractVersion + " at " + SiftContractAddress);
+                        }
+
+                        // Now check the SIFT contract
                         nextContractCheckTime = DateTime.UtcNow.AddSeconds(10);
                     }
 
@@ -423,7 +464,7 @@ namespace Lts.Sift.WinClient
                             }
                         }
                     }
-                    
+
                     // Remove any complete transactions from our list
                     EnqueuedTransaction[] remainingTransactions = queuedTransactions.Where(t => !t.Completed).ToArray();
                     bool anyTransactionsInQueue;
@@ -492,7 +533,7 @@ namespace Lts.Sift.WinClient
         {
             // See if we have enough gas, if not we'll fail it
             HexBigInteger hexValue = new HexBigInteger(new System.Numerics.BigInteger(wei));
-            CallInput input = new CallInput { From = from, To = _contract.Address, Value = hexValue };
+            CallInput input = new CallInput { From = from, To = IcoContractAddress, Value = hexValue };
             HexBigInteger rawGas = await _web3.Eth.Transactions.EstimateGas.SendRequestAsync(input);
             decimal gas = decimal.Parse(rawGas.Value.ToString());
             HexBigInteger rawGasPrice = await _web3.Eth.GasPrice.SendRequestAsync();
@@ -526,7 +567,7 @@ namespace Lts.Sift.WinClient
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.InsufficientFunds, "The specified account does not have sufficient funds.");
 
                 // Determine the gas cost for this
-                TransactionGasInfo gasInfo = await CalculateGasCostForEtherSend(address, _contract.Address, purchaseCostWei);
+                TransactionGasInfo gasInfo = await CalculateGasCostForEtherSend(address, IcoContractAddress, purchaseCostWei);
                 decimal gasPrice = gasInfo.GasPrice;
                 decimal gasCost = gasInfo.GasCost;
                 decimal gas = gasInfo.Gas;
@@ -539,10 +580,10 @@ namespace Lts.Sift.WinClient
                     gasMultiple--;
 
                 // Prompt to unlock account
-                Logger.ApplicationInstance.Debug("Asking user confirmation for sending " + purchaseCostWei + " from " + address + " to " + ContractAddress);
+                Logger.ApplicationInstance.Debug("Asking user confirmation for sending " + purchaseCostWei + " from " + address + " to " + IcoContractAddress);
                 Func<TransactionUnlockViewModel> fnc = new Func<TransactionUnlockViewModel>(() =>
                     {
-                        TransactionUnlockViewModel vm = new TransactionUnlockViewModel(gasCost, gasMultiple, gas, address, _contract.Address, purchaseCostWei);
+                        TransactionUnlockViewModel vm = new TransactionUnlockViewModel(gasCost, gasMultiple, gas, address, IcoContractAddress, purchaseCostWei);
                         TransactionUnlockWindow window = new TransactionUnlockWindow
                         {
                             DataContext = vm
@@ -560,16 +601,16 @@ namespace Lts.Sift.WinClient
                     return new SiftPurchaseResponse(SiftPurchaseFailureType.UnlockError, "Unable to unlock account with the supplied password.");
 
                 // Send and mine the transaction
-                Logger.ApplicationInstance.Debug("Account unlocked, sending " + purchaseCostWei + " from " + address + " to " + ContractAddress);
+                Logger.ApplicationInstance.Debug("Account unlocked, sending " + purchaseCostWei + " from " + address + " to " + IcoContractAddress);
                 TransactionInput transactionInput = new TransactionInput
                 {
                     From = address,
-                    To = _contract.Address,
+                    To = IcoContractAddress,
                     Value = new HexBigInteger(new BigInteger(purchaseCostWei)),
                     GasPrice = new HexBigInteger(new BigInteger(viewModel.SelectedGasMultiplier * gasCost)),
                     Gas = new HexBigInteger(new BigInteger(viewModel.Gas))
                 };
-                Logger.ApplicationInstance.Info("Send transaction for " + purchaseCostWei + " to " + ContractAddress + " from " + address);
+                Logger.ApplicationInstance.Info("Send transaction for " + purchaseCostWei + " to " + IcoContractAddress + " from " + address);
                 string transactionHash = await _web3.Eth.Transactions.SendTransaction.SendRequestAsync(transactionInput);
 
                 // Return the response of the transaction hash
@@ -601,6 +642,36 @@ namespace Lts.Sift.WinClient
             lock (_miningQueueLocker)
                 _miningQueue.Add(transaction);
             return transaction;
+        }
+
+        /// <summary>
+        /// Gets the ABI data for the specified contract.
+        /// </summary>
+        /// <param name="contractName">
+        /// The name of the contract to get the ABI for.
+        /// </param>
+        /// <returns>
+        /// The contents of the ABI for the contract, otherwise an exception is thrown.
+        /// </returns>
+        private string GetAbi(string contractName)
+        {
+            string abi = null;
+            try
+            {
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                string resourceName = "Lts.Sift.WinClient.ContractAbis." + contractName + ".abi";
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+                using (StreamReader reader = new StreamReader(stream))
+                    abi = reader.ReadToEnd();
+            }
+            catch (Exception ex)
+            {
+                Logger.ApplicationInstance.Error("Error reading ABI", ex);
+            }
+            if (string.IsNullOrEmpty(abi))
+                throw new Exception("Error reading contract ABI");
+            Logger.ApplicationInstance.Debug("ABI loaded successfully for contract: " + contractName);
+            return abi;
         }
 
         #region IDisposable Implementation
