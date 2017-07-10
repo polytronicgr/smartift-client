@@ -145,6 +145,9 @@
                                         <Trigger Property="IsMouseOver" Value="true">
                                             <Setter TargetName="image" Property="Source" Value="../Images/sift-win-main-window-button-invest-02.png" />
                                         </Trigger>
+                                        <Trigger Property="IsEnabled" Value="false">
+                                            <Setter TargetName="image" Property="Opacity" Value="0.6" />
+                                        </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Button.Template>
@@ -192,7 +195,7 @@
                     </Button.Template>
                 </Button>
 
-                <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Source="../Images/sift-win-tag-line-more-information.png" Stretch="None" HorizontalAlignment="Center" Margin="0,15,0,0" MouseLeftButtonDown="OnLogoClick" />
+                <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Source="../Images/sift-win-tag-line-more-information.png" Stretch="UniformToFill" HorizontalAlignment="Center" Margin="0,5,0,0" MouseLeftButtonDown="OnLogoClick" Width="450" />
             </Grid>
         </Grid>
     </Border>
