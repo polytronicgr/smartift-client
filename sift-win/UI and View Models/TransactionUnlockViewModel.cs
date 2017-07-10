@@ -81,9 +81,31 @@ namespace Lts.Sift.WinClient
         public string From { get; private set; }
 
         /// <summary>
+        /// Gets the shortened version of the from address.
+        /// </summary>
+        public string FromShortened
+        {
+            get
+            {
+                return From == null || From.Length < 15 ? From : From.Substring(0, 7) + "..." + From.Substring(From.Length - 5, 5);
+            }
+        }
+
+        /// <summary>
         /// Gets who the tranasction is being sent to.
         /// </summary>
         public string To { get; private set; }
+
+        /// <summary>
+        /// Gets the shortened version of the to address.
+        /// </summary>
+        public string ToShortened
+        {
+            get
+            {
+                return To == null || To.Length < 15 ? To : To.Substring(0, 7) + "..." + To.Substring(To.Length - 5, 5);
+            }
+        }
 
         /// <summary>
         /// Gets the amount to be sent with the transaction in whatever unit and rounding is described by DisplayUnit.

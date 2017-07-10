@@ -10,62 +10,130 @@
     WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignData Type=local:TransactionUnlockViewModel}"
         Title="Confirm Transaction" 
-    Topmost="True"
-        xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing" SizeToContent="WidthAndHeight"
-        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None">
-    <StackPanel Orientation="Vertical" Margin="20,20,20,20">
+    Topmost="True" SizeToContent="Height"
+        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None" Width="800">
 
-        <TextBlock FontSize="32" Foreground="Black" Text="Send Transaction" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+    <Window.Resources>
+        <ResourceDictionary Source="Resources.xaml" />
+    </Window.Resources>
+    <Window.Effect>
+        <DropShadowEffect Color="#000000" Direction="0" Opacity=".8" BlurRadius="30" ShadowDepth="0" RenderingBias="Quality" />
+    </Window.Effect>
+    <Border BorderBrush="#CCCCCC" BorderThickness="1">
+        <StackPanel Margin="20,20,20,20" Orientation="Vertical">
 
-        <Grid HorizontalAlignment="Center" Margin="0,20,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+            <Image Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" Margin="0,0,0,35" Source="../Images/sift-win-logo-main-window.png" Stretch="None"  />
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="From" HorizontalAlignment="Center" FontSize="22" Foreground="Black" VerticalAlignment="Center" Margin="10,0,10,0" />
-            <TextBlock Grid.Row="0" Grid.Column="1" Text="Amount" HorizontalAlignment="Center" FontSize="22" Foreground="Black" VerticalAlignment="Center" Margin="40,0,40,0" />
-            <TextBlock Grid.Row="0" Grid.Column="2" Text="To" HorizontalAlignment="Center" FontSize="22" Foreground="Black" VerticalAlignment="Center" Margin="10,0,10,0" />
-            
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Path=From,FallbackValue=0x000000000000000000}" FontSize="18" Foreground="Black" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="{Binding Path=DisplayAmount,FallbackValue=0.00}" FontSize="18" Foreground="Black" VerticalAlignment="Center" Margin="0,0,4,0" />
-                <TextBlock Text="{Binding Path=DisplayUnit,FallbackValue=ether}" FontSize="18" Foreground="Black" VerticalAlignment="Center" Margin="0,0,0,0" />
+            <!-- Account Balance Header -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,15" HorizontalAlignment="Center">
+                <Image Source="../Images/sift-win-main-window-divider-line-left.png" Stretch="None" />
+                <TextBlock Text="TRANSACTION DETAILS" FontFamily="{StaticResource BrandonGrotesque}" Foreground="#BDC3C7" FontSize="16" Margin="12,0,12,0" />
+                <Image Source="../Images/sift-win-main-window-divider-line-right.png" Stretch="None" />
             </StackPanel>
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Path=To,FallbackValue=0x000000000000000000}" FontSize="18" Foreground="Black" VerticalAlignment="Center" Margin="10,0,0,0" />
-        </Grid>
 
-        <Grid Margin="0,20,0,0" HorizontalAlignment="Center">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Gas" FontSize="18" Foreground="Black" VerticalAlignment="Center" Margin="0,10,30,10" />
-            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Path=Gas, StringFormat={}{0} gas}" FontSize="18" Foreground="Black" VerticalAlignment="Center" Margin="0,10,30,10" />
+            <TextBlock FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" Text="To invest in SIFT you will send a transaction over the Ethereum network.  The details of this transaction are shown below.  Please check they are correct before continuing." Margin="0,0,0,0" TextWrapping="Wrap" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Priority" FontSize="18" Foreground="Black" VerticalAlignment="Center" Margin="0,10,30,10" />
-            <Slider Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="{Binding Path=MaximumGasMultiplier}" Value="{Binding Path=SelectedGasMultiplier}" Width="350" Margin="0,10,0,10" VerticalAlignment="Center" />
+            <Grid HorizontalAlignment="Center" Margin="0,15,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Fee" FontSize="18" Foreground="Black" VerticalAlignment="Center" Margin="0,10,30,10" />
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=GasCostEther, StringFormat={}{0} ether}" FontSize="18" Foreground="Black" VerticalAlignment="Center" Margin="0,10,30,10" />
-        </Grid>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="From" HorizontalAlignment="Center" Margin="10,0,10,0" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="Amount" HorizontalAlignment="Center" Margin="10,0,10,0" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" />
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="To" HorizontalAlignment="Center" Margin="10,0,10,0" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" />
 
-        <TextBlock FontSize="18" Foreground="Black" Text="Password" Margin="0,20,0,10" />
-        <PasswordBox FontSize="18" x:Name="password" PasswordChanged="OnPasswordChanged" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Path=FromShortened,FallbackValue=0x00000...00000}" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" HorizontalAlignment="Center" Margin="10,0,10,0" />
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding Path=DisplayAmount,FallbackValue=0.00}" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" HorizontalAlignment="Center" Margin="10,0,04,0" />
+                    <TextBlock Text="{Binding Path=DisplayUnit,FallbackValue=ETH}" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" HorizontalAlignment="Center" Margin="0,0,10,0" />
+                </StackPanel>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Path=ToShortened,FallbackValue=0x00000...00000}" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" HorizontalAlignment="Center" Margin="10,0,10,0" />
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-            <Button Content="Cancel" Margin="0" Padding="20,10,20,10" Command="{Binding Path=CancelCommand}" />
-            <Button Content="Send Transaction" Margin="30,0,0,0" Padding="50,10,50,10" Command="{Binding Path=SendCommand}" />
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" Margin="0,35,0,15" HorizontalAlignment="Center">
+                <Image Source="../Images/sift-win-main-window-divider-line-left.png" Stretch="None" />
+                <TextBlock Text="GAS" FontFamily="{StaticResource BrandonGrotesque}" Foreground="#BDC3C7" FontSize="16" Margin="12,0,12,0" />
+                <Image Source="../Images/sift-win-main-window-divider-line-right.png" Stretch="None" />
+            </StackPanel>
+
+            <TextBlock FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" Text="Sending a transaction with Ethereum has a small transaction fee.  This fee is known as Gas and doesn't go to SIFT but goes to the miners that power the Ethereum network.  The more Gas you pay, the quicker your transaction will be confirmed and the quicker you'll have your Gas - pay the most Gas and you'll get your SIFT in a few seconds, pay the least and it may take a few minutes.  Please select how much you want to spend on Gas below, the default is probably fine." Margin="0,0,0,0" TextWrapping="Wrap" />
+
+            <Grid Margin="0,15,0,0" HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="350" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Gas" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" HorizontalAlignment="Center" Margin="10,0,10,0" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Path=Gas, StringFormat={}{0} gas}" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" HorizontalAlignment="Center" Margin="10,0,10,0" />
+
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="Fee" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" HorizontalAlignment="Center" Margin="10,0,10,00" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=GasCostEther, StringFormat={}{0} ether}" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" HorizontalAlignment="Center" Margin="10,0,10,0" />
+
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="Priority" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" HorizontalAlignment="Center" Margin="10,0,10,0" />
+                <Slider Grid.Row="1" Grid.Column="2" Minimum="1" Maximum="{Binding Path=MaximumGasMultiplier}" Value="{Binding Path=SelectedGasMultiplier}" Margin="10,0,10,0" HorizontalAlignment="Stretch" />
+            </Grid>
+
+
+            <StackPanel Orientation="Horizontal" Margin="0,35,0,15" HorizontalAlignment="Center">
+                <Image Source="../Images/sift-win-main-window-divider-line-left.png" Stretch="None" />
+                <TextBlock Text="AUTHENTICATION" FontFamily="{StaticResource BrandonGrotesque}" Foreground="#BDC3C7" FontSize="16" Margin="12,0,12,0" />
+                <Image Source="../Images/sift-win-main-window-divider-line-right.png" Stretch="None" />
+            </StackPanel>
+
+            <TextBlock FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" Text="To confirm your investment in SIFT you need to enter your Ethereum wallet password for the selected account into the box below.  Once you've entered your password press the Invest button to send the transaction to the Ethereum network." Margin="0,0,0,0" TextWrapping="Wrap" />
+
+            <Grid Margin="0,20,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,0,5" Text="Password" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" />
+                <PasswordBox Grid.Row="1" Grid.Column="0" x:Name="password" PasswordChanged="OnPasswordChanged" FontSize="14.7" Foreground="#808080" FontFamily="{StaticResource BrandonGrotesque}" />
+
+                <Button Grid.Row="0" Grid.RowSpan="4" Grid.Column="1" Margin="35,0,0,0"  Content="Cancel" Command="{Binding Path=CancelCommand}" VerticalAlignment="Bottom">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Name="image" Source="../Images/sift-win-main-window-button-cancel-01.png" Stretch="None" />
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter TargetName="image" Property="Source" Value="../Images/sift-win-main-window-button-cancel-02.png" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <Button Grid.Row="0" Grid.RowSpan="4" Grid.Column="2" Padding="0" Command="{Binding Path=SendCommand}" Margin="35,0,0,0" VerticalAlignment="Bottom">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Name="image" Source="../Images/sift-win-main-window-button-invest-01.png" Stretch="None" />
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter TargetName="image" Property="Source" Value="../Images/sift-win-main-window-button-invest-02.png" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+            </Grid>
         </StackPanel>
-    </StackPanel>
+    </Border>
 </local:BaseDragableWindow>

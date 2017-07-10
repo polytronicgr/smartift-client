@@ -264,5 +264,9 @@
     <Resource Include="Images\sift-win-dialog-button-no-01.png" />
     <Resource Include="Images\sift-win-dialog-button-no-02.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\sift-win-main-window-button-cancel-01.png" />
+    <Resource Include="Images\sift-win-main-window-button-cancel-02.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
