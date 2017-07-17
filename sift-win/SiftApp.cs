@@ -34,10 +34,52 @@ namespace Lts.Sift.WinClient
                 Logger.ApplicationInstance.Error("Error parsing value for ethereum URL, will use default", ex);
             }
             _ethereumManager = new EthereumManager(string.IsNullOrEmpty(url) ? "http://localhost:8545/" : url);
+
+            // Hookup to events
+            Exit += OnExit;
         }
         #endregion
 
         #region Event Handlers
+        /// <summary>
+        /// Handle the application shutting down.
+        /// </summary>
+        /// <param name="sender">
+        /// The event sender.
+        /// </param>
+        /// <param name="e">
+        /// The event arguments.
+        /// </param>
+        private void OnExit(object sender, ExitEventArgs e)
+        {
+            // Free up all our view models
+            foreach (Window window in Windows)
+            {
+                IDisposable disposable = window.DataContext as IDisposable;
+                if (disposable == null)
+                    continue;
+                try
+                {
+                    disposable.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Logger.ApplicationInstance.Error("Failed to free up view model " + disposable.GetType().Name + " for window " + window.GetType().Name, ex);
+                }
+            }
+
+            // Free up our ethereum manager
+            try
+            {
+                _ethereumManager?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Logger.ApplicationInstance.Error("Failed to free up ethereum manager", ex);
+            }
+            _ethereumManager = null;
+        }
+
         /// <summary>
         /// Handle the application starting up and show our first window.
         /// </summary>

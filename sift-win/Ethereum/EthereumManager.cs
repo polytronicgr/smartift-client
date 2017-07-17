@@ -25,22 +25,22 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines the address of SIFT's contract.
         /// </summary>
-        public const string SiftContractAddress = "0x8A12268B60065CA9ea29EF0f80F14e3F1cD0313d";
+        public const string SiftContractAddress = "0xB60F1f8C789aDf4762e5d40d94fDD3c325848183";
 
         /// <summary>
         /// Defines the version of the SIFT contract we are expecting.
         /// </summary>
-        public const decimal SiftContractVersion = 500201707071147m;
+        public const decimal SiftContractVersion = 500201707171440m;
 
         /// <summary>
         /// Defines the address of the ICO's contract.
         /// </summary>
-        public const string IcoContractAddress = "0xf7D42837C6173ce38a4B2bb63AE70860f4a47982";
+        public const string IcoContractAddress = "0x19614C3D9C0777b93d74eCe3FD0f3860A0140744";
 
         /// <summary>
         /// Defines the version of the ICO contract we are expecting.
         /// </summary>
-        public const decimal IcoContractVersion = 300201707071208m;
+        public const decimal IcoContractVersion = 300201707171440m;
 
         /// <summary>
         /// Defines whether or not the thread is alive that checks in the background.
@@ -71,6 +71,16 @@ namespace Lts.Sift.WinClient
         /// Defines whether or not the ICO has been abandoned.
         /// </summary>
         private bool _isIcoAbandoned;
+
+        /// <summary>
+        /// Defines the earliest that people can invest in the ICO.
+        /// </summary>
+        private DateTime _icoStartDate;
+
+        /// <summary>
+        /// Defines the latest that people can invest in the ICO.
+        /// </summary>
+        private DateTime _icoEndDate;
 
         /// <summary>
         /// Defines the current block number.
@@ -155,6 +165,36 @@ namespace Lts.Sift.WinClient
                 if (_isIcoAbandoned == value)
                     return;
                 _isIcoAbandoned = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets the earliest that people can invest in the ICO.
+        /// </summary>
+        public DateTime IcoStartDate
+        {
+            get { return _icoStartDate; }
+            private set
+            {
+                if (_icoStartDate == value)
+                    return;
+                _icoStartDate = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets the latest that people can invest in the ICO.
+        /// </summary>
+        public DateTime IcoEndDate
+        {
+            get { return _icoEndDate; }
+            private set
+            {
+                if (_icoEndDate == value)
+                    return;
+                _icoEndDate = value;
                 NotifyPropertyChanged();
             }
         }
@@ -340,6 +380,10 @@ namespace Lts.Sift.WinClient
 
                             // Check if the ICO is abandoned
                             IsIcoAbandoned = _icoContract.GetFunction("icoAbandoned").CallAsync<bool>().Result;
+
+                            // Check the ICO dates
+                            IcoStartDate = DateFromTimestamp(_icoContract.GetFunction("icoStartTime").CallAsync<ulong>().Result);
+                            IcoEndDate = DateFromTimestamp(_icoContract.GetFunction("icoEndTime").CallAsync<ulong>().Result);
 
                             // Whilst we're here we also want to check the gas cost to send
                             DefaultGasInfo = CalculateGasCostForEtherSend("0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", IcoContractAddress, 1000000000000000000m).Result;
@@ -678,6 +722,20 @@ namespace Lts.Sift.WinClient
                 throw new Exception("Error reading contract ABI");
             Logger.ApplicationInstance.Debug("ABI loaded successfully for contract: " + contractName);
             return abi;
+        }
+
+        /// <summary>
+        /// Gets a date time from a unix epoch timestamp.
+        /// </summary>
+        /// <param name="timestamp">
+        /// The timestamp to get the DateTime object from.
+        /// </param>
+        /// <returns>
+        /// A new date time object.
+        /// </returns>
+        private static DateTime DateFromTimestamp(ulong timestamp)
+        {
+            return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddSeconds(timestamp);
         }
 
         #region IDisposable Implementation

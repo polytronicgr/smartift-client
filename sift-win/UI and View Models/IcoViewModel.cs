@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 
@@ -10,7 +11,7 @@ namespace Lts.Sift.WinClient
     /// <summary>
     /// This class holds the current state of the main window when the contract is in ICO mode of operation.
     /// </summary>
-    public class IcoViewModel : BaseViewModel
+    public class IcoViewModel : BaseViewModel, IDisposable
     {
         #region Declarations
         /// <summary>
@@ -67,6 +68,16 @@ namespace Lts.Sift.WinClient
         /// Defines the view model for the transaction confirmation popup.
         /// </summary>
         private SiftDialogViewModel _miningTransactionDialogViewModel;
+
+        /// <summary>
+        /// Defines a timer to use to check whether the ICO is open and if neccessary update the UI.
+        /// </summary>
+        private Timer _icoOpenTimer;
+
+        /// <summary>
+        /// Determines whether the ICO was open the last time the UI was updated.
+        /// </summary>
+        private bool _wasIcoOpen = false;
         #endregion
 
         #region Properties
@@ -277,10 +288,34 @@ namespace Lts.Sift.WinClient
             SiftInvestCommand = new AwaitableDelegateCommand(Invest);
             SiftIncreaseQuantityCommand = new DelegateCommand(() => { SiftAmountToPurchase++; });
             SiftDecreaseQuantityCommand = new DelegateCommand(() => { SiftAmountToPurchase--; });
+
+            // Create a timer to wait for ICO to open
+            _icoOpenTimer = new Timer(1000)
+            {
+                AutoReset = true,
+                Enabled = true
+            };
+            _icoOpenTimer.Elapsed += OnIcoIsOpenTimer;
         }
         #endregion
 
         #region Event Handlers
+        /// <summary>
+        /// Handle the timer ticking whenever we need to check if the ICO has opened.
+        /// </summary>
+        /// <param name="sender">
+        /// The event sender.
+        /// </param>
+        /// <param name="e">
+        /// The event arguments.
+        /// </param>
+        private void OnIcoIsOpenTimer(object sender, ElapsedEventArgs e)
+        {
+            bool isIcoOpen = DateTime.UtcNow >= _ethereumManager.IcoStartDate && DateTime.UtcNow <= _ethereumManager.IcoEndDate;
+            if (isIcoOpen != _wasIcoOpen)
+                UpdateSiftPurchaseSettings();
+        }
+
         /// <summary>
         /// Handle the transaction we're mining having it's properties updated.
         /// </summary>
@@ -381,6 +416,18 @@ namespace Lts.Sift.WinClient
             // Disable UI
             SiftInvestIsEnabled = false;
 
+            // Check times
+            if (DateTime.UtcNow < _ethereumManager.IcoStartDate)
+            {
+                SiftDialog.ShowDialog("ICO Not Open", "The ICO for SIFT does not open until " + _ethereumManager.IcoStartDate.ToShortDateString() + " (00:00 GMT).  Please wait until this time to invest in SIFT.");
+                return;
+            }
+            else if (DateTime.UtcNow > _ethereumManager.IcoEndDate)
+            {
+                SiftDialog.ShowDialog("ICO Not Open", "The ICO for SIFT finished at " + _ethereumManager.IcoStartDate.ToShortDateString() + " (00:00 GMT).  As soon as the ICO has been closed you will be able to purchase SIFT via an open marketplace.");
+                return;
+            }
+
             // Perform the purchase
             SiftPurchaseResponse response = await _ethereumManager.PurchaseSift(SelectedAccount.Address, SiftAmountToPurchase);
             if (!response.WasSuccessful)
@@ -433,6 +480,10 @@ namespace Lts.Sift.WinClient
         /// </summary>
         private void UpdateSiftPurchaseSettings()
         {
+            // Determine if ICO is open
+            bool isIcoOpen = DateTime.UtcNow >= _ethereumManager.IcoStartDate && DateTime.UtcNow <= _ethereumManager.IcoEndDate;
+            _wasIcoOpen = isIcoOpen;
+
             // If we haven't got an account or no balance, hide the buy section
             if (SelectedAccount == null || SelectedAccount.BalanceWei < EthereumManager.WeiPerSift)
             {
@@ -462,7 +513,21 @@ namespace Lts.Sift.WinClient
             // Setup the various settings for this account
             SiftMaximumPurchase = maximumPurchaseVolume;
             SiftAmountToPurchase = SiftMaximumPurchase;
-            SiftInvestIsEnabled = SiftMaximumPurchase > 0;
+            SiftInvestIsEnabled = SiftMaximumPurchase > 0 && isIcoOpen;
         }
+
+        #region IDisposable Implementation
+        /// <summary>
+        /// Free up our resources.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_icoOpenTimer != null)
+            {
+                _icoOpenTimer.Elapsed -= OnIcoIsOpenTimer;
+                _icoOpenTimer = null;
+            }
+        }
+        #endregion
     }
 }
