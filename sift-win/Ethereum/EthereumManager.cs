@@ -25,7 +25,7 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines the address of SIFT's contract.
         /// </summary>
-        public const string SiftContractAddress = "0xB60F1f8C789aDf4762e5d40d94fDD3c325848183";
+        public const string SiftContractAddress = "0x8a187d5285d316bcbc9adafc08b51d70a0d8e000";
 
         /// <summary>
         /// Defines the version of the SIFT contract we are expecting.
@@ -35,7 +35,7 @@ namespace Lts.Sift.WinClient
         /// <summary>
         /// Defines the address of the ICO's contract.
         /// </summary>
-        public const string IcoContractAddress = "0x19614C3D9C0777b93d74eCe3FD0f3860A0140744";
+        public const string IcoContractAddress = "0xf8Fc0cc97d01A47E0Ba66B167B120A8A0DeAb949";
 
         /// <summary>
         /// Defines the version of the ICO contract we are expecting.
