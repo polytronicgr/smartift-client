@@ -9,22 +9,62 @@
         IsEnabled="{Binding Path=IsUiEnabled}" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignData Type=local:PostIcoViewModel}"
         Title="Smart Investment Fund Token (SIFT)" SizeToContent="WidthAndHeight" 
-        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None" MaxWidth="740" Height="500">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        Background="#FFFFFF" ResizeMode="NoResize" WindowStyle="None" MaxWidth="550" >
 
-        <Border Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,0,0,30">
-            <Image Source="../Images/header.png" StretchDirection="DownOnly" Stretch="UniformToFill" HorizontalAlignment="Center" MaxWidth="720" />
-        </Border>
+    <Window.Resources>
+        <ResourceDictionary Source="Resources.xaml" />
+    </Window.Resources>
+    <Window.Effect>
+        <DropShadowEffect Color="#000000" Direction="0" Opacity=".8" BlurRadius="30" ShadowDepth="0" RenderingBias="Quality" />
+    </Window.Effect>
 
-        <TextBlock Grid.Row="1" Grid.Column="1" FontSize="32" Foreground="Black" Text="Post-ICO support is not available in this version, please download the latest version from smartift.com" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+    <Border BorderBrush="#CCCCCC" BorderThickness="1">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <Button Grid.Row="3" Grid.Column="0" Content="Exit" HorizontalAlignment="Right" Margin="10" Padding="20,10,20,10" Command="{Binding Path=ExitCommand}" VerticalAlignment="Bottom" />
-    </Grid>
+            <Image Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="0,0,0,35" Source="../Images/sift-win-logo-dialog-box.png" StretchDirection="DownOnly" Stretch="UniformToFill"  />
+
+            <!-- Logos Depending on Configuration-->
+            <Image Source="../Images/sift-win-dialog-logo-sift-01.png" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" VerticalAlignment="Top" Margin="15,0,15,0" Width="38" Stretch="UniformToFill" HorizontalAlignment="Left" />
+
+            <!-- Main Text -->
+            <TextBlock Grid.Row="1" Grid.Column="1" FontSize="16" Foreground="#808080" FontFamily="{StaticResource BrandonText}" FontWeight="Medium" Text="ICO Finished" />
+            <TextBlock Grid.Row="2" Grid.Column="1" FontSize="14" Foreground="#808080" FontFamily="{StaticResource BrandonText}" Text="The SIFT ICO has finished.  A new version of the application is available that supports all the post-ICO functionality within SIFT.  Please check our website at http://SmartIFT.com for more details." TextWrapping="Wrap" Margin="0,0,0,25" />
+
+            <!-- Buttons -->
+            <Button Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left" Padding="0" Command="{Binding Path=LogViewCommand}" Background="Transparent" BorderThickness="0" Visibility="{Binding Path=IsLogButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Image Name="image" Source="../Images/sift-win-log-button-01.png" Stretch="None" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="image" Property="Source" Value="../Images/sift-win-log-button-02.png" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <Button Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" Content="Exit" Margin="0" Padding="0" Command="{Binding Path=ExitCommand}" VerticalAlignment="Bottom">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Image Name="image" Source="../Images/sift-win-dialog-exit-button-red-01.png" Stretch="None" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="image" Property="Source" Value="../Images/sift-win-dialog-exit-button-red-02.png" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </Grid>
+    </Border>
 </local:BaseDragableWindow>
