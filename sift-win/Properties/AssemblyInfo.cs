@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("Smart Investment Fund Token (SIFT)")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("SIFT LLC")]
+[assembly: AssemblyCompany("Logical Trading Systems Limited")]
 [assembly: AssemblyProduct("Smart Investment Fund Token (SIFT)")]
-[assembly: AssemblyCopyright("Copyright © SIFT LLC 2017")]
+[assembly: AssemblyCopyright("Copyright © Logical Trading Systems Limited 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

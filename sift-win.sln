@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sift-win", "sift-win\sift-win.csproj", "{8410B0EC-90F6-4896-B29B-1A2F7F7502B9}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Setup", "Setup\Setup.wixproj", "{55A1D734-E6F8-4BAF-AC00-7612CE2F8B3E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8410B0EC-90F6-4896-B29B-1A2F7F7502B9} = {8410B0EC-90F6-4896-B29B-1A2F7F7502B9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

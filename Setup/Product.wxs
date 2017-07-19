@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="Smart Investment Fund Token (SIFT)" Language="1033" Version="1.0.0" Manufacturer="SIFT LLC" UpgradeCode="a4396d92-cd5f-459b-9b02-1cf6f88934c9">
+  <Product Id="*" Name="Smart Investment Fund Token (SIFT)" Language="1033" Version="1.0.0" Manufacturer="Logical Trading Systems Limited" UpgradeCode="a4396d92-cd5f-459b-9b02-1cf6f88934c9">
     <Package InstallerVersion="200" Description="The SIFT Windows GUI provides easy access to manage your SIFT shareholding." Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated" Manufacturer="SIFT LLC" />
 
     <!-- Single CAB used to store all contents -->
