@@ -54,7 +54,7 @@ for ($i = 0; $i -lt $existingContents.Length; $i++)
     if ($line.StartsWith("  <Product "))
     {
 		$shortVersion = $versionParts[0] + "." + $versionParts[1] + "." + $versionParts[2]
-        $existingContents[$i] = "  <Product Id=`"*`" Name=`"LTS Admin Console`" Language=`"1033`" Version=`"" + $shortVersion + "`" Manufacturer=`"Logical Trading Systems LLC`" UpgradeCode=`"59d0dc2a-8f53-400a-9d08-9df7d4e093f6`">"
+        $existingContents[$i] = "  <Product Id=`"*`" Name=`"Smart Investment Fund Token (SIFT)`" Language=`"1033`" Version=`"" + $shortVersion + "`" Manufacturer=`"Logical Trading Systems Ltd`" UpgradeCode=`"a4396d92-cd5f-459b-9b02-1cf6f88934c9`">"
         continue
     }
 }
