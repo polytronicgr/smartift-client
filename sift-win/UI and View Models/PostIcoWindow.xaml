@@ -38,7 +38,7 @@
 
             <!-- Main Text -->
             <TextBlock Grid.Row="1" Grid.Column="1" FontSize="16" Foreground="#808080" FontFamily="{StaticResource BrandonText}" FontWeight="Medium" Text="ICO Finished" />
-            <TextBlock Grid.Row="2" Grid.Column="1" FontSize="14" Foreground="#808080" FontFamily="{StaticResource BrandonText}" Text="The SIFT ICO has finished.  A new version of the application is available that supports all the post-ICO functionality within SIFT.  Please check our website at http://SmartIFT.com for more details." TextWrapping="Wrap" Margin="0,0,0,25" />
+            <TextBlock Grid.Row="2" Grid.Column="1" FontSize="14" Foreground="#808080" FontFamily="{StaticResource BrandonText}" Text="The SIFT ICO has finished.  Please check our website at http://SmartIFT.com for more details and to be notified of any future applications that we release.  You can also keep up to date via Telegram at https://t.me/smartift." TextWrapping="Wrap" Margin="0,0,0,25" />
 
             <!-- Buttons -->
             <Button Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left" Padding="0" Command="{Binding Path=LogViewCommand}" Background="Transparent" BorderThickness="0" Visibility="{Binding Path=IsLogButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}">
